@@ -41,6 +41,7 @@ The AI assistant should adapt its questions based on the prompt, prioritizing un
 - **Design/UX:** "Are there any UI/UX requirements or existing patterns to follow?"
 - **Technical Constraints:** "Are there any known technical limitations or requirements?"
 - **Edge Cases:** "What could go wrong? Any special scenarios to consider?"
+- **Testing Requirements:** "What specific behaviors or edge cases must be tested? Are there critical user flows that need test coverage?"
 
 ## PRD Structure
 
@@ -53,8 +54,9 @@ The generated PRD should include the following sections:
 5. **Non-Goals (Out of Scope):** Clearly state what this feature will *not* include to manage scope.
 6. **Design Considerations (Optional):** Link to mockups, describe UI/UX requirements, or mention relevant components/styles if applicable.
 7. **Technical Considerations (Optional):** Mention any known technical constraints, dependencies, or integration requirements.
-8. **Success Metrics:** How will the success of this feature be measured? Include both quantitative and qualitative indicators.
-9. **Open Questions:** List any remaining questions or areas needing further clarification.
+8. **Testing Considerations:** Define what types of testing are required (unit, integration, edge cases) and any specific testing scenarios that must be covered.
+9. **Success Metrics:** How will the success of this feature be measured? Include both quantitative and qualitative indicators.
+10. **Open Questions:** List any remaining questions or areas needing further clarification.
 
 ## Guiding Principles
 
