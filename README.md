@@ -91,13 +91,14 @@ Let me create a comprehensive specification..."
 
 ## What You'll Find Here
 
-### `guidelines-for-clarifying-feature-specifications.md`
+### `guidelines-for-creatively-generating-feature-specifications.md`
 
 The complete framework document containing:
 - **Clarifying Questions Framework** - Prioritized question categories
 - **PRD Structure** - Template for comprehensive specifications  
 - **Guiding Principles** - The core philosophy including "Creative Abandon Within Scope"
 - **Process Flow** - Step-by-step implementation guide
+- **Testing Considerations** - Integrated testing requirements and scenarios
 
 This isn't just documentation - it's a tested system that consistently produces high-quality specifications while preventing the most common AI pitfalls.
 
@@ -115,8 +116,8 @@ By open-sourcing this approach, I hope to:
 
 ## Getting Started
 
-1. **Copy the guidelines file** to your AI assistant context
-2. **Use the activation prompt**: "Please follow the PRD creation guidelines. Feature request: [YOUR REQUEST]"
+1. **Copy the guidelines file** (`guidelines-for-creatively-generating-feature-specifications.md`) to your AI assistant context
+2. **Use the activation prompt**: "Please follow the Feature Specification / Product Requirements Document (PRD) guidelines. Feature request: [YOUR REQUEST]"
 3. **Let the AI establish boundaries first** before exploring solutions
 4. **Watch it create comprehensive specs** that actually meet your needs
 
