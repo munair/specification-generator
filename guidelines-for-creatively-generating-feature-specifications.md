@@ -1,101 +1,170 @@
 # Rule: Feature Specification / Product Requirements Document (PRD)
 
 ## Overview
-
 The framework explicitly tells an AI Assistant: "First, build the fence. Then, explore every inch of the playground."
 
-## Goal
+---
 
-To guide an AI assistant in creating a detailed Feature Specification / Product Requirements Document (PRD) in Markdown format, based on an initial user prompt. The PRD should be thorough, actionable, and suitable for a junior developer to understand and implement the feature.
+## 1. Application Process
 
-## Process
+1. **Receive Prompt** – User provides a feature request
+2. **Determine Scope** – Assess if this needs Quick Start or Full Process (see below)
+3. **Clarify Before Writing** – Ask clarifying questions *only for details not already provided*
+   - Skip questions clearly addressed in the prompt
+   - Always verify boundaries, testing approach, and failure handling
+4. **Generate PRD** – Create a comprehensive Markdown PRD using the appropriate structure
+5. **Save PRD** – Save as `feature-specification-[feature-name].md` in `/documentation/`
+6. **Review & Approve (Critical Checkpoint)** 
+   - Present draft for explicit user approval
+   - Do not proceed until approved
+7. **Commit** – Only after approval, commit the PRD
+8. **Begin Implementation** – Do not generate tasks until PRD is committed
 
-1. **Receive Initial Prompt:** The user provides a brief description or request for a new feature or functionality.
-2. **Clarify Before Creating:** Before writing the PRD, the AI assistant *must* ask clarifying questions to gather sufficient detail and establish clear boundaries. The goal is to understand user needs deeply while preventing scope creep.
-3. **Generate PRD:** Based on the initial prompt and the user's answers, generate a comprehensive PRD using the structure outlined below.
-4. **Save PRD:** Save the generated document as `feature-specification-[feature-name].md` inside the `/documentation` directory.
-5. **Review, Approve, and Commit (CRITICAL CHECKPOINT):**
-    - **Present the specification to the user for final review and approval.**
-    - **Prompt the user:** "I have drafted the Feature Specification. Please review it to ensure it aligns with your goals. Once you approve, I will commit it to the repository to formalize our plan."
-    - **Wait for explicit user approval.**
-    - **Commit the approved specification to the repository.** Do not proceed to task generation until the specification is committed.
+### When to Use Quick Start vs Full Process
+- **Quick Start:** Bug fixes, minor enhancements, single-purpose utilities, technical debt
+- **Full Process:** New user-facing features, system integrations, data handling changes, anything with external dependencies
 
-## Clarifying Questions Framework
+---
 
-The AI assistant should adapt its questions based on the prompt, prioritizing understanding over assumptions. Focus on these key areas:
+## 2. Clarifying Questions Framework
 
-### Essential (Always Ask)
-- **Boundaries:** "What should this feature *not* do? Any explicit non-goals?"
-- **Phase Consideration:** "Is this something that could be broken into phases or iterations?"
-- **Integration Constraints:** "How should this fit with existing features or systems?"
-- **Rollback Strategy:** "If this feature needs to be disabled or reverted after deployment, how should that work?"
+### Essential (Always Verify If Not Clear)
+- **Boundaries:** What should this feature *not* do? Any explicit non-goals?
+- **Phasing:** Should this be broken into phases or iterations?
+- **Integration:** How does this fit with existing features or systems?
+- **Failure & Recovery:** How should rollback, data migration failures, or partial deployments be handled?
+- **Testing Requirements:** What critical behaviors, user flows, and edge cases must be tested?
+- **Success Metrics:** How will we measure success (both quantitative and qualitative)?
 
-### Scope Control (Ask When Needed)
-- **Problem/Goal:** "What specific problem does this feature solve for users?"
-- **Target User:** "Who is the primary user of this feature?"
-- **Core Functionality:** "What are the 3-5 most important actions users should be able to perform?"
-- **Success Definition:** "How will we know this feature is working well?"
-
-### Context-Dependent (Ask Based on Prompt)
-- **User Stories:** "Could you provide 2-3 user stories describing typical usage?"
-- **Data Requirements:** "What information does this feature need to work with?"
-- **Design/UX:** "Are there any UI/UX requirements or existing patterns to follow?"
-- **Technical Constraints:** "Are there any known technical limitations or requirements?"
-- **Edge Cases:** "What could go wrong? Any special scenarios to consider?"
-- **Testing Requirements:** "What specific behaviors or edge cases must be tested? Are there critical user flows that need test coverage?"
-
-### Creative Exploration (Always Consider)
-**Guidance:** Always consider at least one creative exploration prompt unless the feature is trivial or purely technical. Choose prompts that best fit the feature's nature and potential.
-
-When the feature could benefit from creative exploration, consider these prompts:
-- **Dream Scenario:** "If this feature wildly exceeded expectations, what would that look like?"
-- **Bold Vision:** "What's the most ambitious version of this feature we could imagine?"
-- **Failure Modes:** "What could go spectacularly wrong if we're not careful?"
-- **Metaphors:** "Is there a metaphor or analogy that captures the essence of this feature?"
-- **Delight Factors:** "What unexpected touches could make this feature memorable?"
-
-### Optional Boundary Checklist (For Complex Features)
-For features with significant scope or integration complexity, verify:
+**For Complex Features - Boundary Checklist:**
 - ☐ Have we listed 3-5 explicit things this feature will NOT do?
-- ☐ Have we defined Phase 1 (minimal viable) vs Phase 2 (future enhancements)?
+- ☐ Have we defined Phase 1 (minimal viable) vs Phase 2+ (future enhancements)?
 - ☐ Have we identified all system integrations and dependencies?
 - ☐ Have we outlined clear acceptance criteria?
-- ☐ Have we defined success metrics and failure thresholds?
+- ☐ Have we defined success metrics with failure thresholds?
 
-## PRD Structure
+### Scope Control (Ask When Needed)
+- **Problem/Goal:** What specific problem does this solve for users?
+- **Target User:** Who is the primary user of this feature?
+- **Core Functionality:** What are the most important actions users should be able to perform?
 
-The generated PRD should include the following sections:
+### Context-Dependent (Ask Based on Feature Type)
+- **User Stories:** For user-facing features
+- **Data Requirements:** For data-processing features
+- **Design/UX:** For UI components
+- **Technical Constraints:** For system-level changes
+- **Performance Requirements:** For high-traffic or resource-intensive features
 
-1. **Introduction/Overview:** Briefly describe the feature and the problem it solves. State the primary goal.
-2. **Goals:** List specific, measurable objectives for this feature.
-3. **User Stories:** Detail user narratives describing feature usage and benefits.
-4. **Functional Requirements:** List specific functionalities the feature must have. Use clear, numbered requirements (e.g., "The system must allow users to upload a profile picture").
-5. **Non-Goals (Out of Scope):** Clearly state what this feature will *not* include to manage scope.
-6. **Design Considerations (Optional):** Link to mockups, describe UI/UX requirements, or mention relevant components/styles if applicable.
-7. **Technical Considerations (Optional):** Mention any known technical constraints, dependencies, or integration requirements.
-8. **Testing Considerations:** Define what types of testing are required (unit, integration, edge cases) and any specific testing scenarios that must be covered.
-9. **Success Metrics:** How will the success of this feature be measured? Include both quantitative and qualitative indicators.
-10. **Open Questions:** List any remaining questions or areas needing further clarification.
+### Creative Exploration (Use When Feature Has Strategic Impact)
+**Skip for:** Bug fixes, technical debt, minor UI adjustments, internal tools
+**Use for:** New user experiences, competitive differentiators, novel workflows
 
-## Guiding Principles
+Consider these prompts:
+- **Dream Scenario:** "If this wildly exceeded expectations, what would that look like?"
+- **Bold Vision:** "What's the most ambitious version we could imagine?"
+- **Failure Modes:** "What could go spectacularly wrong?"
+- **Metaphor:** "What analogy captures the essence of this feature?"
+- **Delight Factors:** "What unexpected touches could make this memorable?"
 
-- **Establish Boundaries First:** Lock down scope, non-goals, and constraints before exploring possibilities
-- **Creative Abandon Within Scope:** Once boundaries are clear, be maximally creative and comprehensive within those constraints
-- **Stay Tethered:** Every requirement should trace back to a stated user need
-- **Target Junior Developers:** Requirements should be explicit, unambiguous, and avoid unnecessary jargon
-- **Question Assumptions:** When in doubt, ask rather than assume
-- **No Silent Assumptions:** If clarifying questions remain unanswered, either: (a) ask follow-up questions, (b) explicitly document assumptions in the PRD, or (c) list them in the "Open Questions" section. Never proceed with hidden assumptions
-- **Use Optional Tools Judiciously:** The creative exploration prompts and boundary checklist are tools, not requirements. Use them when they add value, skip them when they would add unnecessary process
+---
 
-## Output Requirements
+## 3. PRD Structure
+
+### Quick Start PRD (Minimal)
+1. **Overview** – One paragraph: what and why
+2. **Goals** – Bullet list of objectives
+3. **Functional Requirements** – Numbered list of must-haves
+4. **Non-Goals** – What it won't do
+5. **Testing Considerations** – Key test scenarios
+6. **Success Metrics** – How we'll measure success
+
+### Full PRD (Comprehensive)
+1. **Introduction/Overview** – Feature description and problem it solves
+2. **Goals** – Specific, measurable objectives
+3. **Vision & Creative Considerations** *(Optional)* – Aspirational scenarios, metaphors, delight factors
+4. **User Stories** – Narrative descriptions of feature usage
+5. **Functional Requirements** – Numbered list (e.g., "FR1: The system must...")
+6. **Non-Goals (Out of Scope)** – Explicit exclusions to manage scope
+7. **Design Considerations** *(Optional)* – UI/UX requirements, mockups
+8. **Technical Considerations** *(Optional)* – Architecture, dependencies, constraints
+9. **Failure & Recovery Strategy** – Rollback plan, error handling, data recovery
+10. **Testing Considerations** – Unit, integration, edge cases, critical user flows
+11. **Success Metrics** – Quantitative and qualitative measures
+12. **Open Questions** – Unresolved items needing future clarification
+
+---
+
+## 4. Guiding Principles
+
+- **Boundaries First, Creativity Second** – Define the fence before exploring the playground
+- **Right-Size the Effort** – Match PRD depth to feature complexity
+- **Skip Redundant Questions** – Don't re-ask what's already clearly stated
+- **Every Requirement Traces to a Need** – No features without clear user benefit
+- **Write for Junior Developers** – Explicit, unambiguous, jargon-free
+- **Surface All Assumptions** – Document or question them, never hide them
+- **Testing is Mandatory** – Every feature must define test scenarios
+
+---
+
+## 5. Output Requirements
 
 - **Format:** Markdown (`.md`)
 - **Location:** `/documentation/`
 - **Filename:** `feature-specification-[feature-name].md`
 
-## Final Instructions
+---
 
-1. **Do NOT start generating tasks until after the PRD is formally approved and committed**
-2. **Ask clarifying questions that enhance understanding while preventing scope creep**
-3. **Use the user's answers to create a comprehensive yet focused PRD**
-4. **If the scope seems too large, suggest breaking the feature into phases**
+## Examples
+
+### Quick Start Example:
+```markdown
+# Feature Specification: Add CSV Export to Reports
+
+## Overview
+Users need to export report data for use in Excel and other tools. This feature adds a "Download CSV" button to all report pages.
+
+## Goals
+- Enable data export from any report view
+- Maintain current filtering/sorting in exported data
+- Support reports up to 10,000 rows
+
+## Functional Requirements
+FR1: System must add "Download CSV" button to report toolbar
+FR2: CSV must include all visible columns in current order
+FR3: Export must respect current filters and sorting
+FR4: System must show progress indicator for exports over 1000 rows
+
+## Non-Goals
+- Custom column selection for export
+- Other formats (Excel, PDF)
+- Scheduled/automated exports
+
+## Testing Considerations
+- Export with various filter combinations
+- Large dataset performance (10k rows)
+- Special characters in data
+- Empty report states
+
+## Success Metrics
+- 80% of users who view reports use export within first month
+- Export completes in <5 seconds for typical reports (<1000 rows)
+```
+
+### Full PRD Structure Example:
+*(Show just the headers for space)*
+```markdown
+# Feature Specification: Customer Portal Dashboard
+
+## Introduction/Overview
+## Goals
+## Vision & Creative Considerations
+## User Stories
+## Functional Requirements
+## Non-Goals (Out of Scope)
+## Design Considerations
+## Technical Considerations
+## Failure & Recovery Strategy
+## Testing Considerations
+## Success Metrics
+## Open Questions
+```
