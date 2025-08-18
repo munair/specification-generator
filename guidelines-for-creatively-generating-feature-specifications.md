@@ -43,6 +43,23 @@ The AI assistant should adapt its questions based on the prompt, prioritizing un
 - **Edge Cases:** "What could go wrong? Any special scenarios to consider?"
 - **Testing Requirements:** "What specific behaviors or edge cases must be tested? Are there critical user flows that need test coverage?"
 
+### Optional Creative Exploration (When Appropriate)
+When the feature could benefit from creative exploration, consider these prompts:
+- **Dream Scenario:** "If this feature wildly exceeded expectations, what would that look like?"
+- **Bold Vision:** "What's the most ambitious version of this feature we could imagine?"
+- **Failure Modes:** "What could go spectacularly wrong if we're not careful?"
+- **Metaphors:** "Is there a metaphor or analogy that captures the essence of this feature?"
+- **Delight Factors:** "What unexpected touches could make this feature memorable?"
+
+### Optional Boundary Checklist (For Complex Features)
+For features with significant scope or integration complexity, verify:
+- ☐ Have we listed 3-5 explicit things this feature will NOT do?
+- ☐ Have we defined Phase 1 (minimal viable) vs Phase 2 (future enhancements)?
+- ☐ Have we identified all system integrations and dependencies?
+- ☐ Have we outlined clear acceptance criteria?
+- ☐ Have we defined success metrics and failure thresholds?
+- ☐ Do we have a rollback/reversion plan?
+
 ## PRD Structure
 
 The generated PRD should include the following sections:
@@ -65,6 +82,7 @@ The generated PRD should include the following sections:
 - **Stay Tethered:** Every requirement should trace back to a stated user need
 - **Target Junior Developers:** Requirements should be explicit, unambiguous, and avoid unnecessary jargon
 - **Question Assumptions:** When in doubt, ask rather than assume
+- **Use Optional Tools Judiciously:** The creative exploration prompts and boundary checklist are tools, not requirements. Use them when they add value, skip them when they would add unnecessary process
 
 ## Output Requirements
 
