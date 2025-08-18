@@ -1,0 +1,32 @@
+{
+  "name": "specification-generator",
+  "version": "1.0.0",
+  "description": "A framework for guiding AI assistants to create comprehensive feature specifications through structured creativity",
+  "main": "README.md",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ai",
+    "specification",
+    "prd",
+    "product-requirements",
+    "feature-specification",
+    "ai-assistant",
+    "product-management",
+    "documentation"
+  ],
+  "author": "Incremental Capital",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/incrementalcapital/specification-generator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/incrementalcapital/specification-generator/issues"
+  },
+  "homepage": "https://github.com/incrementalcapital/specification-generator#readme"
+}
