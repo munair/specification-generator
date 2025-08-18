@@ -32,6 +32,42 @@ Once boundaries are locked down, the AI assistant is encouraged to be **maximall
 
 This approach leverages the AI's natural strengths (creativity, thoroughness, pattern recognition) while preventing its weaknesses (scope creep, assumption-making).
 
+## Two Ways to Use This Framework
+
+### 1. AI-Generated Specifications (Recommended)
+Use the **guidelines** to have an AI assistant generate comprehensive PRDs through intelligent conversation:
+- **File**: `guidelines-for-creatively-generating-feature-specifications.md`
+- **Best for**: Teams with AI assistants, rapid prototyping, exploring complex features
+- **Process**: AI asks clarifying questions → establishes boundaries → generates complete PRD
+
+### 2. Manual Template Approach
+Use the **templates** to manually fill out specifications:
+- **Files**: 
+  - `templates/feature-specification-template-simple.md` - For straightforward features
+  - `templates/feature-specification-template-full.md` - For complex, strategic features
+- **Best for**: Teams without AI access, highly regulated environments, teaching specification writing
+- **Process**: Choose template → fill in sections → review with checklist
+
+Both approaches produce the same high-quality output - choose based on your tools and workflow.
+
+## When to Use Which Approach
+
+| Scenario | Recommended Approach | Why |
+|----------|---------------------|-----|
+| Rapid feature ideation | AI-Generated | AI excels at creative exploration within boundaries |
+| Teaching junior PMs | Manual Templates | Templates provide structure and learning scaffolding |
+| Complex system integrations | AI-Generated (Full) | AI can handle complexity while maintaining coherence |
+| Simple bug fixes | Manual Template (Simple) | Quick, straightforward documentation |
+| Regulated environments | Manual Templates | Full control over every word written |
+| Exploring novel features | AI-Generated + Freeform | Maximum creativity with structured output |
+
+## Additional Tools
+
+### Freeform Exploration
+- **File**: `guidelines-for-freeform-feature-specification-generation.md`
+- **Purpose**: Creative brainstorming before formal specification
+- **Use when**: You need to explore wild ideas before constraining them
+
 ## Why This Framework Works
 
 ### The Power of Metaphor in AI Instruction
@@ -102,6 +138,30 @@ The complete framework document containing:
 
 This isn't just documentation - it's a tested system that consistently produces high-quality specifications while preventing the most common AI pitfalls.
 
+## Getting Started
+
+### For AI-Generated Specifications:
+1. **Copy the guidelines file** (`guidelines-for-creatively-generating-feature-specifications.md`) to your AI assistant context
+2. **Use the activation prompt**: "Please follow the Feature Specification / Product Requirements Document (PRD) guidelines. Feature request: [YOUR REQUEST]"
+3. **Let the AI establish boundaries first** before exploring solutions
+4. **Watch it create comprehensive specs** that actually meet your needs
+
+### For Manual Specifications:
+1. **Choose your template**:
+   - Simple: For bug fixes, minor enhancements, single features
+   - Full: For major features, integrations, strategic initiatives
+2. **Fill out sections in order** - Don't skip the boundaries!
+3. **Use the quality checklist** before finalizing
+4. **Keep for reference** during implementation
+
+## Results You Can Expect
+
+Teams using this framework report:
+- **Faster specification cycles** - Less back-and-forth clarification
+- **More focused features** - Reduced scope creep and feature bloat
+- **Better AI collaboration** - Clearer expectations and outputs
+- **Improved developer handoffs** - Specifications that junior developers can actually implement
+
 ## Why Open Source This?
 
 Product managers, developers, and AI practitioners everywhere struggle with the same challenge: how to harness AI's creative power without losing control of scope and requirements.
@@ -113,21 +173,6 @@ By open-sourcing this approach, I hope to:
 - **Standardize AI specification practices** across teams and organizations
 - **Enable better human-AI collaboration** in product development
 - **Demonstrate the power of metaphor-driven AI instruction**
-
-## Getting Started
-
-1. **Copy the guidelines file** (`guidelines-for-creatively-generating-feature-specifications.md`) to your AI assistant context
-2. **Use the activation prompt**: "Please follow the Feature Specification / Product Requirements Document (PRD) guidelines. Feature request: [YOUR REQUEST]"
-3. **Let the AI establish boundaries first** before exploring solutions
-4. **Watch it create comprehensive specs** that actually meet your needs
-
-## Results You Can Expect
-
-Teams using this framework report:
-- **Faster specification cycles** - Less back-and-forth clarification
-- **More focused features** - Reduced scope creep and feature bloat
-- **Better AI collaboration** - Clearer expectations and outputs
-- **Improved developer handoffs** - Specifications that junior developers can actually implement
 
 ## Contributing
 
