@@ -36,7 +36,7 @@ This approach leverages the AI's natural strengths (creativity, thoroughness, pa
 
 ### 1. AI-Generated Specifications (Recommended)
 Use the **guidelines** to have an AI assistant generate comprehensive PRDs through intelligent conversation:
-- **File**: `guidelines-for-creatively-generating-feature-specifications.md`
+- **File**: `guidelines/guidelines-for-creatively-generating-feature-specifications.md`
 - **Best for**: Teams with AI assistants, rapid prototyping, exploring complex features
 - **Process**: AI asks clarifying questions → establishes boundaries → generates complete PRD
 
@@ -52,19 +52,19 @@ Both approaches produce the same high-quality output - choose based on your tool
 
 ## When to Use Which Approach
 
-| Scenario | Recommended Approach | Why |
-|----------|---------------------|-----|
-| Rapid feature ideation | AI-Generated | AI excels at creative exploration within boundaries |
-| Teaching junior PMs | Manual Templates | Templates provide structure and learning scaffolding |
-| Complex system integrations | AI-Generated (Full) | AI can handle complexity while maintaining coherence |
-| Simple bug fixes | Manual Template (Simple) | Quick, straightforward documentation |
-| Regulated environments | Manual Templates | Full control over every word written |
-| Exploring novel features | AI-Generated + Freeform | Maximum creativity with structured output |
+| Scenario                    | Recommended Approach     | Why                                                  |
+|-----------------------------|--------------------------|------------------------------------------------------|
+| Rapid feature ideation      | AI-Generated             | AI excels at creative exploration within boundaries  |
+| Teaching junior PMs         | Manual Templates         | Templates provide structure and learning scaffolding |
+| Complex system integrations | AI-Generated (Full)      | AI can handle complexity while maintaining coherence |
+| Simple bug fixes            | Manual Template (Simple) | Quick, straightforward documentation                 |
+| Regulated environments      | Manual Templates         | Full control over every word written                 |
+| Exploring novel features    | AI-Generated + Freeform  | Maximum creativity with structured output            |
 
 ## Additional Tools
 
 ### Freeform Exploration
-- **File**: `guidelines-for-freeform-feature-specification-generation.md`
+- **File**: `guidelines/guidelines-for-freeform-feature-specification-generation.md`
 - **Purpose**: Creative brainstorming before formal specification
 - **Use when**: You need to explore wild ideas before constraining them
 
@@ -127,7 +127,7 @@ Let me create a comprehensive specification..."
 
 ## What You'll Find Here
 
-### `guidelines-for-creatively-generating-feature-specifications.md`
+### `guidelines/guidelines-for-creatively-generating-feature-specifications.md`
 
 The complete framework document containing:
 - **Clarifying Questions Framework** - Prioritized question categories
@@ -136,12 +136,12 @@ The complete framework document containing:
 - **Process Flow** - Step-by-step implementation guide
 - **Testing Considerations** - Integrated testing requirements and scenarios
 
-This isn't just documentation - it's a tested system that consistently produces high-quality specifications while preventing the most common AI pitfalls.
+This isn't just documentation - it's a tested system that consistently produces high-quality specifications while preventing the most common AI pitfalls. See the `examples/` directory for real-world PRDs that led to successful implementations, including a budget filtering feature that was delivered in record time.
 
 ## Getting Started
 
 ### For AI-Generated Specifications:
-1. **Copy the guidelines file** (`guidelines-for-creatively-generating-feature-specifications.md`) to your AI assistant context
+1. **Copy the guidelines file** (`guidelines/guidelines-for-creatively-generating-feature-specifications.md`) to your AI assistant context
 2. **Use the activation prompt**: "Please follow the Feature Specification / Product Requirements Document (PRD) guidelines. Feature request: [YOUR REQUEST]"
 3. **Let the AI establish boundaries first** before exploring solutions
 4. **Watch it create comprehensive specs** that actually meet your needs
