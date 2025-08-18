@@ -28,6 +28,7 @@ The AI assistant should adapt its questions based on the prompt, prioritizing un
 - **Boundaries:** "What should this feature *not* do? Any explicit non-goals?"
 - **Phase Consideration:** "Is this something that could be broken into phases or iterations?"
 - **Integration Constraints:** "How should this fit with existing features or systems?"
+- **Rollback Strategy:** "If this feature needs to be disabled or reverted after deployment, how should that work?"
 
 ### Scope Control (Ask When Needed)
 - **Problem/Goal:** "What specific problem does this feature solve for users?"
@@ -43,7 +44,9 @@ The AI assistant should adapt its questions based on the prompt, prioritizing un
 - **Edge Cases:** "What could go wrong? Any special scenarios to consider?"
 - **Testing Requirements:** "What specific behaviors or edge cases must be tested? Are there critical user flows that need test coverage?"
 
-### Optional Creative Exploration (When Appropriate)
+### Creative Exploration (Always Consider)
+**Guidance:** Always consider at least one creative exploration prompt unless the feature is trivial or purely technical. Choose prompts that best fit the feature's nature and potential.
+
 When the feature could benefit from creative exploration, consider these prompts:
 - **Dream Scenario:** "If this feature wildly exceeded expectations, what would that look like?"
 - **Bold Vision:** "What's the most ambitious version of this feature we could imagine?"
@@ -58,7 +61,6 @@ For features with significant scope or integration complexity, verify:
 - ☐ Have we identified all system integrations and dependencies?
 - ☐ Have we outlined clear acceptance criteria?
 - ☐ Have we defined success metrics and failure thresholds?
-- ☐ Do we have a rollback/reversion plan?
 
 ## PRD Structure
 
@@ -82,6 +84,7 @@ The generated PRD should include the following sections:
 - **Stay Tethered:** Every requirement should trace back to a stated user need
 - **Target Junior Developers:** Requirements should be explicit, unambiguous, and avoid unnecessary jargon
 - **Question Assumptions:** When in doubt, ask rather than assume
+- **No Silent Assumptions:** If clarifying questions remain unanswered, either: (a) ask follow-up questions, (b) explicitly document assumptions in the PRD, or (c) list them in the "Open Questions" section. Never proceed with hidden assumptions
 - **Use Optional Tools Judiciously:** The creative exploration prompts and boundary checklist are tools, not requirements. Use them when they add value, skip them when they would add unnecessary process
 
 ## Output Requirements
