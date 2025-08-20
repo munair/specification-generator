@@ -32,41 +32,43 @@ Once boundaries are locked down, the AI assistant is encouraged to be **maximall
 
 This approach leverages the AI's natural strengths (creativity, thoroughness, pattern recognition) while preventing its weaknesses (scope creep, assumption-making).
 
-## Two Ways to Use This Framework
+## Three Approaches to Use This Framework
 
-### 1. AI-Generated Specifications (Recommended)
-Use the **guidelines** to have an AI assistant generate comprehensive PRDs through intelligent conversation:
+### 1. Primary Approach: AI-Generated Specifications (Formal Guidelines)
+Use the **formal guidelines** to have an AI assistant generate comprehensive PRDs through intelligent conversation:
 - **File**: `guidelines/guidelines-for-creatively-generating-feature-specifications.md`
-- **Best for**: Teams with AI assistants, rapid prototyping, exploring complex features
+- **Best for**: Most feature requests, especially when you have clear requirements
 - **Process**: AI asks clarifying questions → establishes boundaries → generates complete PRD
 
-### 2. Manual Template Approach
-Use the **templates** to manually fill out specifications:
+### 2. Few-Shot Templates: Manual Templates as Examples
+Use the **templates** as few-shot examples in AI prompts or for manual specification creation:
 - **Files**: 
   - `templates/feature-specification-template-simple.md` - For straightforward features
   - `templates/feature-specification-template-full.md` - For complex, strategic features
-- **Best for**: Teams without AI access, highly regulated environments, teaching specification writing
-- **Process**: Choose template → fill in sections → review with checklist
+- **Best for**: Teaching AI "what good looks like," teams without AI access, highly regulated environments
+- **Process**: Include template examples in AI context OR choose template → fill in sections → review with checklist
 
-Both approaches produce the same high-quality output - choose based on your tools and workflow.
+### 3. Freeform Exploration: Creative Fallback
+Use the **freeform guidelines** only when the primary approach fails OR you specifically need creative solutions:
+- **File**: `guidelines/guidelines-for-freeform-feature-specification-generation.md`
+- **Best for**: Creative exploration when stuck, brainstorming novel solutions, when structured approaches aren't working
+- **Process**: Creative overflow → migrate essentials to formal specification
+
+All three approaches have the capacity to produce high-quality output - choose based on your scenario and needs.
 
 ## When to Use Which Approach
 
-| Scenario                    | Recommended Approach     | Why                                                  |
-|-----------------------------|--------------------------|------------------------------------------------------|
-| Rapid feature ideation      | AI-Generated             | AI excels at creative exploration within boundaries  |
-| Teaching junior PMs         | Manual Templates         | Templates provide structure and learning scaffolding |
-| Complex system integrations | AI-Generated (Full)      | AI can handle complexity while maintaining coherence |
-| Simple bug fixes            | Manual Template (Simple) | Quick, straightforward documentation                 |
-| Regulated environments      | Manual Templates         | Full control over every word written                 |
-| Exploring novel features    | AI-Generated + Freeform  | Maximum creativity with structured output            |
-
-## Additional Tools
-
-### Freeform Exploration
-- **File**: `guidelines/guidelines-for-freeform-feature-specification-generation.md`
-- **Purpose**: Creative brainstorming before formal specification
-- **Use when**: You need to explore wild ideas before constraining them
+| Scenario                           | Recommended Approach        | Why                                                                |
+|------------------------------------|-----------------------------|--------------------------------------------------------------------|
+| Most feature requests              | Primary (Formal)            | Structured approach prevents scope creep and ensures completeness  |
+| Teaching AI "what good looks like" | Few-Shot Templates          | Templates serve as concrete examples in prompts                    |
+| Teams without AI access            | Few-Shot Templates          | Manual templates provide structure and learning scaffolding        |
+| Complex system integrations        | Primary (Formal)            | AI can handle complexity while maintaining coherence               |
+| Simple bug fixes                   | Few-Shot Templates (Simple) | Quick, straightforward documentation                               |
+| Regulated environments             | Few-Shot Templates          | Full control over every word written                               |
+| When primary approach fails        | Freeform Exploration        | Creative rescue when structured approach isn't working             |
+| Novel, unexplored features         | Freeform → Primary          | Creative exploration, then migrate to structured spec              |
+| Need creative solutions            | Freeform Exploration        | When you specifically need innovative approaches                   |
 
 ## Why This Framework Works
 
@@ -135,8 +137,19 @@ The complete framework document containing:
 - **Guiding Principles** - The core philosophy including "Creative Abandon Within Scope"
 - **Process Flow** - Step-by-step implementation guide
 - **Testing Considerations** - Integrated testing requirements and scenarios
+- **Feature Tagging Strategy** - Institutionalized approach for descriptive tagging
+- **Implementation Journey Best Practices** - Complete process from creative exploration to production
 
-This isn't just documentation - it's a tested system that consistently produces high-quality specifications while preventing the most common AI pitfalls. See the `examples/` directory for real-world PRDs that led to successful implementations, including a budget filtering feature that was delivered in record time.
+This isn't just documentation - it's a **battle-tested system** that consistently produces high-quality specifications while preventing the most common AI pitfalls. 
+
+### Real-World Validation
+
+See the `examples/` directory for **two battle-tested PRDs** that led to successful implementations:
+
+1. **[Budget Filtering](examples/feature-specification-for-budget-filtering.md)** - Complex business logic feature with 5 explicit constraints, delivered in record time
+2. **[Persistent Display CSS Grid Solution](examples/feature-specification-persistent-display-css-grid-solution.md)** - UI/UX optimization using creative exploration approach
+
+These examples demonstrate the framework's evolution from theoretical guidelines to **proven methodology** with measurable results.
 
 ## Getting Started
 
