@@ -5,7 +5,39 @@ All notable changes to the Specification Generator framework will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2024-12-19
+## [1.1.0] - Wednesday, August 20, 2025
+
+### Added
+- **Real-world validation with persistent display CSS Grid solution**
+  - Complete feature specification showing UI/UX optimization
+  - Framework application notes documenting creative exploration → formal specification → implementation journey
+  - Technical solution: CSS Grid approach eliminating text wrapping while maintaining accessibility
+
+- **Framework evolution and institutionalized learnings**
+  - Feature tagging strategy with descriptive naming approach (`persistent-display-css-grid-solution`)
+  - Implementation journey best practices: Freeform → Formal → Implementation flow
+  - Testing integration guidelines for aligning tests with component structure changes
+  - Documentation lifecycle: Complete process from creative exploration to archived specifications
+
+- **Enhanced guidelines with real-world insights**
+  - Freeform guidelines: Added Section 7 with comprehensive tagging strategy and benefits
+  - Formal guidelines: Added Section 6 with tagging process and implementation best practices
+  - Examples README: Updated with new example and framework evolution insights
+
+### Framework Maturity
+- **Battle-tested examples**: Two real-world implementations (budget filtering + persistent display)
+- **Proven process**: Complete journey from creative exploration to production implementation
+- **Institutionalized learning**: Key patterns and best practices captured for future teams
+- **Adoption readiness**: Framework transformed from theoretical to proven methodology
+
+### Impact
+Teams adopting this framework now have:
+- Concrete examples of different feature types (business logic + UI/UX)
+- Complete implementation journeys to follow
+- Institutionalized best practices and tagging strategies
+- Proof that the approach works in real-world scenarios
+
+## [1.0.0] - Monday, August 18, 2025
 
 ### Added
 - **Complete framework for AI-generated feature specifications**
@@ -46,4 +78,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History
 
+- **1.1.0**: Real-world validation with battle-tested examples and institutionalized learnings
 - **1.0.0**: Initial stable release with complete framework, templates, and real-world validation 
