@@ -168,3 +168,44 @@ FR4: System must show progress indicator for exports over 1000 rows
 ## Success Metrics
 ## Open Questions
 ```
+
+---
+
+## 6. Feature Tagging Strategy
+
+After successful implementation and testing, tag the feature with a descriptive name that reflects the core solution approach:
+
+### Tagging Guidelines:
+- **Use the feature specification name**: `[feature-name]-[solution-approach]`
+- **Be specific and searchable**: `persistent-display-css-grid-solution`
+- **Include the technical approach**: `user-authentication-oauth2-integration`
+- **Avoid generic version tags**: Use descriptive tags instead of `v1.2.3`
+
+### Examples:
+- `persistent-display-css-grid-solution` ✅
+- `user-preferences-local-storage` ✅
+- `real-time-notifications-websocket` ✅
+- `v0.5.1` ❌ (too generic)
+
+### When to Tag:
+- After successful implementation and testing
+- Before version bumps (which come after documentation updates)
+- When the feature is production-ready
+
+### Tagging Process:
+1. **Implementation Complete**: Feature is implemented, tested, and working
+2. **Create Descriptive Tag**: Use `git tag [feature-name]-[solution-approach]`
+3. **Document the Tag**: Reference the tag in commit messages and documentation
+4. **Version Management**: Reserve version bumps for after documentation updates and housekeeping
+
+### Benefits:
+- **Searchability**: Easy to find specific feature implementations
+- **Documentation**: Tags serve as implementation markers
+- **Technical History**: Preserves solution approaches over time
+- **Team Communication**: Clear feature identification
+- **Version Management**: Proper separation of concerns
+
+### Implementation Journey Best Practices:
+- **Freeform → Formal → Implementation Flow**: Start with creative exploration, migrate to structured requirements, implement with iterative refinement
+- **Testing Alignment Strategy**: Update tests to match new component structures, mock context data with complete objects
+- **Documentation Evolution**: Keep freeform exploration for creative history, archive formal specifications after completion
