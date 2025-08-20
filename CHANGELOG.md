@@ -24,6 +24,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Formal guidelines: Added Section 6 with tagging process and implementation best practices
   - Examples README: Updated with new example and framework evolution insights
 
+### Documentation Improvements
+- **Three-way framework clarification**: Resolved contradiction between "Two Ways" and actual three approaches
+- **Enhanced practical understanding**: Emphasized tools with potential rather than guaranteed outcomes
+- **Flexible usage patterns**: Clarified that approaches can be used independently or in combination
+- **Creative intent recognition**: Positioned freeform as intentional exploration, not just fallback
+- **Professional presentation**: Improved table formatting and documentation clarity
+
 ### Framework Maturity
 - **Battle-tested examples**: Two real-world implementations (budget filtering + persistent display)
 - **Proven process**: Complete journey from creative exploration to production implementation
