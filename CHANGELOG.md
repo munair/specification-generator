@@ -30,6 +30,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Institutionalized learning**: Key patterns and best practices captured for future teams
 - **Adoption readiness**: Framework transformed from theoretical to proven methodology
 
+### Why This Matters
+
+This release demonstrates the framework's effectiveness through **two battle-tested examples**:
+
+1. **[Budget Filtering](examples/feature-specification-for-budget-filtering.md)** (Business Logic) - Complex feature with 5 explicit constraints
+2. **[Persistent Display](examples/feature-specification-persistent-display-css-grid-solution.md)** (UI/UX) - Technical layout optimization with accessibility focus
+
+The first uses the [guidelines for creatively generating feature specifications](guidelines/guidelines-for-creatively-generating-feature-specifications.md) and the second uses the [guidelines for freeform feature specification generation](guidelines/guidelines-for-freeform-feature-specification-generation.md).
+
 ### Impact
 Teams adopting this framework now have:
 - Concrete examples of different feature types (business logic + UI/UX)
