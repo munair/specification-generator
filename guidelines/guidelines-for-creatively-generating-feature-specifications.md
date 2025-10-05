@@ -19,6 +19,7 @@ The framework explicitly tells an AI Assistant: "First, build the fence. Then, e
    - Do not proceed until approved
 7. **Commit** – Only after approval, commit the PRD
 8. **Begin Implementation** – Do not generate tasks until PRD is committed
+9. **Archive Completed PRD** – After successful implementation and deployment, move PRD to `/documentation/specifications/` to maintain clean project organization
 
 ### When to Use Quick Start vs Full Process
 - **Quick Start:** Bug fixes, minor enhancements, single-purpose utilities, technical debt
@@ -104,13 +105,38 @@ Consider these prompts:
 - **Surface All Assumptions** – Document or question them, never hide them
 - **Testing is Mandatory** – Every feature must define test scenarios
 
+### Supporting Documentation Guidelines
+- **User Guides** – Create for all user-facing features to ensure adoption and proper usage
+- **Testing Procedures** – Document specialized testing approaches (accessibility, performance, etc.)
+- **Rollback Plans** – Required for complex features that could impact production stability
+- **Lessons Learned** – Capture insights from challenging implementations for knowledge transfer
+- **Implementation Logs** – Archive detailed task completion records using `implementation-log-[feature].md` naming convention
+
+### PRD Lifecycle Management
+- **Active Development** – PRDs remain in `/documentation/` during feature development
+- **Completed Features** – Successfully implemented PRDs are archived to `/documentation/specifications/`
+- **Supporting Documentation** – Feature-related documents organized in semantic folders:
+  - `/documentation/information/` – User guides and end-user documentation
+  - `/documentation/testing/` – Testing methodologies and procedures
+  - `/documentation/rollbacks/` – Emergency rollback procedures and plans
+  - `/documentation/lessons/` – Educational materials and lessons learned
+  - `/documentation/tasks/completed/` – Implementation logs (using `implementation-log-[feature].md` naming)
+- **Organizational Benefits** – Semantic folder structure improves discoverability, separates content by audience and purpose, maintains project documentation standards across the complete development lifecycle
+
 ---
 
 ## 5. Output Requirements
 
 - **Format:** Markdown (`.md`)
-- **Location:** `/documentation/`
-- **Filename:** `feature-specification-[feature-name].md`
+- **PRD Location:** `/documentation/` (during development), `/documentation/specifications/` (after completion)
+- **PRD Filename:** `feature-specification-[feature-name].md`
+- **Supporting Documentation Structure:**
+  - **User Guides:** `/documentation/information/user-guide-[feature-name].md`
+  - **Testing Procedures:** `/documentation/testing/[test-type]-testing-[feature-name].md`
+  - **Rollback Plans:** `/documentation/rollbacks/rollback-plan-[feature-name].md`
+  - **Lessons Learned:** `/documentation/lessons/[feature-name]-lessons-learned.md`
+  - **Implementation Logs:** `/documentation/tasks/completed/implementation-log-[feature-name].md`
+- **Archival Process:** Move completed PRDs and organize all supporting documentation in semantic folders to maintain clean project structure and optimize discoverability by document type and target audience
 
 ---
 
