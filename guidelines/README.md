@@ -16,9 +16,15 @@ Guidelines are now organized by **domain** (backend vs frontend) and **approach*
 - **Better Sorting** - Related guidelines grouped alphabetically
 - **Future-Proof** - Easy to add new domains (mobile, embedded, desktop, etc.)
 
-## The Three Guidelines
+## The Framework Guidelines
 
-### `backend-feature-specification-guidelines.md`
+This directory contains **four essential guidelines** that form the complete feature development framework:
+
+### PRD Generation Guidelines (3)
+
+These three guidelines help you create comprehensive Product Requirements Documents:
+
+#### `backend-feature-specification-guidelines.md`
 **Domain**: Lambda functions, APIs, data processing, backend services
 
 **For Use With**:
@@ -43,7 +49,7 @@ Guidelines are now organized by **domain** (backend vs frontend) and **approach*
 
 ---
 
-### `frontend-feature-specification-guidelines.md`
+#### `frontend-feature-specification-guidelines.md`
 **Domain**: React/TypeScript applications, UI components, user interfaces
 
 **For Use With**:
@@ -69,7 +75,7 @@ Guidelines are now organized by **domain** (backend vs frontend) and **approach*
 
 ---
 
-### `exploratory-feature-specification-guidelines.md`
+#### `exploratory-feature-specification-guidelines.md`
 **Domain**: Creative ideation, novel solutions, constraint-free thinking
 
 **For Use With**:
@@ -94,6 +100,41 @@ Guidelines are now organized by **domain** (backend vs frontend) and **approach*
 
 ---
 
+### Task Generation Guideline (1)
+
+This guideline transforms approved PRDs into actionable implementation task lists:
+
+#### `guidelines-for-generating-tasks.md`
+**Purpose**: Convert feature specifications into granular, atomic task lists for implementation
+
+**For Use With**:
+- Approved feature specifications (any domain)
+- Implementation planning
+- Task tracking and completion
+- Archival workflow management
+
+**Key Features**:
+- ⚠️ **ARCHIVAL PROTOCOL** (lines 13-61) - Critical completion workflow
+- Granular task breakdown methodology
+- Interactive check-in process (high-level plan approval before detailed tasks)
+- Implementation discipline (complexity reality checks, over-engineering prevention)
+- Domain-specific testing approaches (Backend vs Frontend)
+- Three-File Rule and inline-first principles
+- Executable bash commands for archival verification
+- Task format examples and completion workflow
+
+**Testing Standards**:
+- **Backend**: Node.js native modules only (`assert`, `fs`, `path`)
+- **Frontend**: Vitest + React Testing Library with component mocking
+
+**Critical Protocol**: Contains the **ARCHIVAL PROTOCOL** that all three PRD guidelines reference for proper task completion, renaming, and archival.
+
+**When to Use**: After PRD approval and before implementation begins. This guideline ensures systematic, well-documented implementation tracking.
+
+**Output**: `/documentation/tasks/active/implementing-[feature-name].md`
+
+---
+
 ## Decision Matrix: Which Guideline to Use?
 
 | Your Need                              | Use This Guideline | Then                                    |
@@ -111,13 +152,17 @@ Guidelines are now organized by **domain** (backend vs frontend) and **approach*
 
 ## Complete Specification Lifecycle
 
-### 1. PRD Generation
-Choose appropriate guideline → AI establishes boundaries → generates comprehensive PRD
+### 1. PRD Generation (Use PRD Guidelines)
+Choose appropriate guideline (Backend, Frontend, or Exploratory) → AI establishes boundaries → generates comprehensive PRD
 
 **Critical Checkpoint**: Review, approve, and commit PRD before implementation
 
-### 2. Task Breakdown
-Use `guidelines-for-generating-tasks.md` to break PRD into atomic tasks
+**Guidelines**: `backend-feature-specification-guidelines.md`, `frontend-feature-specification-guidelines.md`, or `exploratory-feature-specification-guidelines.md`
+
+### 2. Task Breakdown (Use Task Generation Guideline)
+Use `guidelines-for-generating-tasks.md` to transform approved PRD into granular, atomic implementation tasks
+
+**Process**: High-level plan approval → detailed sub-task generation → implementation tracking
 
 **Output**: `/documentation/tasks/active/implementing-[feature-name].md`
 
@@ -210,16 +255,22 @@ This approach prevents scope creep while enabling creative, complete solutions.
 
 ## Guidelines Maintenance
 
-All three guidelines now include:
-- ✅ Archival cross-reference section
+All four guidelines now include:
+- ✅ Archival cross-reference section (PRD guidelines reference task guideline)
 - ✅ Domain-first naming convention
 - ✅ Quick Start vs Full Process variants (Backend/Frontend)
 - ✅ Testing approach specific to domain
 - ✅ Integration with task generation workflow
 - ✅ Feature tagging strategy for implementation tracking
+- ✅ Complete ARCHIVAL PROTOCOL in task generation guideline
 
-**Last Updated**: November 2, 2025
-**Framework Version**: Domain-First Organization (v2.0)
+**Framework Structure**:
+- **3 PRD Generation Guidelines**: Backend, Frontend, Exploratory
+- **1 Task Generation Guideline**: Transforms PRDs into implementation tasks
+- **Cross-References**: All PRD guidelines reference the ARCHIVAL PROTOCOL
+
+**Last Updated**: Monday, November 3, 2025
+**Framework Version**: Complete Framework (v2.1)
 
 ---
 
@@ -235,6 +286,10 @@ All three guidelines now include:
 # Exploratory PRD activation
 "Follow exploratory-feature-specification-guidelines.md to explore: [REQUEST]"
 
-# Archival verification
+# Task generation from approved PRD
+"Follow guidelines-for-generating-tasks.md to create implementation tasks for: [PRD FILE]"
+
+# Archival verification (before completing implementation)
 grep -c "- \[ \]" documentation/tasks/active/implementing-[feature-name].md
+# ^ Must return 0 before archiving
 ```
