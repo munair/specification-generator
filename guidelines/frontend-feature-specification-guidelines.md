@@ -125,7 +125,20 @@ Consider these prompts:
 
 ---
 
-## 5. Output Requirements
+## 5. Archival Cross-Reference
+
+**IMPORTANT**: When archiving implementation logs, follow the **ARCHIVAL PROTOCOL** in `guidelines-for-generating-tasks.md`.
+
+Key requirements:
+1. Mark ALL tasks complete (`- [ ]` → `- [x]`)
+2. Rename from `implementing-` to `implementation-log-`
+3. Move to `documentation/tasks/completed/`
+
+**DO NOT** attempt to archive without following the protocol checklist.
+
+---
+
+## 6. Output Requirements
 
 - **Format:** Markdown (`.md`)
 - **PRD Location:** `/documentation/` (during development), `/documentation/specifications/` (after completion)
@@ -140,7 +153,7 @@ Consider these prompts:
 
 ---
 
-## Examples
+## 7. Examples
 
 ### Quick Start Example:
 ```markdown
@@ -197,7 +210,7 @@ FR4: System must show progress indicator for exports over 1000 rows
 
 ---
 
-## 6. Feature Tagging Strategy
+## 8. Feature Tagging Strategy
 
 After successful implementation and testing, tag the feature with a descriptive name that reflects the core solution approach:
 
