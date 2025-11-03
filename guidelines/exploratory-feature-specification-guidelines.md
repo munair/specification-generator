@@ -52,7 +52,20 @@ It is intentionally loose. Use it to let the AI (or the human writer) **wander t
 
 ---
 
-## 7. Feature Tagging Strategy
+## 7. Archival Cross-Reference
+
+**IMPORTANT**: When archiving implementation logs, follow the **ARCHIVAL PROTOCOL** in `guidelines-for-generating-tasks.md`.
+
+Key requirements:
+1. Mark ALL tasks complete (`- [ ]` → `- [x]`)
+2. Rename from `implementing-` to `implementation-log-`
+3. Move to `documentation/tasks/completed/`
+
+**DO NOT** attempt to archive without following the protocol checklist.
+
+---
+
+## 8. Feature Tagging Strategy
 
 After implementation, tag the feature with a descriptive name that reflects the core solution:
 
