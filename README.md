@@ -101,7 +101,7 @@ Choose the appropriate guideline (Backend, Frontend, or Exploratory) and generat
 **Critical Checkpoint**: PRD must be reviewed, approved, and committed before implementation begins.
 
 ### 2. Task Generation
-Using `guidelines-for-generating-tasks.md`, break the approved PRD into atomic, actionable tasks.
+Using `implementation-tasks-creation-guidelines.md`, break the approved PRD into atomic, actionable tasks.
 
 **Location**: `/documentation/tasks/active/implementing-[feature-name].md`
 
@@ -109,7 +109,7 @@ Using `guidelines-for-generating-tasks.md`, break the approved PRD into atomic, 
 Execute tasks with full test coverage and documentation.
 
 ### 4. Archival
-Follow the **ARCHIVAL PROTOCOL** in `guidelines-for-generating-tasks.md`:
+Follow the **ARCHIVAL PROTOCOL** in `implementation-tasks-creation-guidelines.md`:
 - Mark ALL tasks complete (`- [ ]` → `- [x]`)
 - Rename from `implementing-` to `implementation-log-`
 - Move to `/documentation/tasks/completed/`
@@ -195,7 +195,7 @@ The creative exploration framework containing:
 - **Migration Path** - Moving from freeform to systematic PRD
 - **Archival Cross-Reference** - Links to task completion workflow
 
-### `guidelines-for-generating-tasks.md`
+### `implementation-tasks-creation-guidelines.md`
 
 The task generation and archival framework containing:
 - **ARCHIVAL PROTOCOL** - Step-by-step completion workflow (lines 13-61)

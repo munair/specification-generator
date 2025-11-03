@@ -128,7 +128,7 @@ interface ComponentContextValue {
 
 ## Archival Cross-Reference
 
-**IMPORTANT**: After implementation, follow the **ARCHIVAL PROTOCOL** in `guidelines-for-generating-tasks.md`:
+**IMPORTANT**: After implementation, follow the **ARCHIVAL PROTOCOL** in `implementation-tasks-creation-guidelines.md`:
 
 1. Mark ALL tasks complete (`- [ ]` → `- [x]`)
 2. Rename from `implementing-` to `implementation-log-`

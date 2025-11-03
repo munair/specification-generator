@@ -156,7 +156,7 @@ This specification demonstrates the power of the Exploratory → Frontend guidel
 - **Test Coverage**: Visual regression tests + component interaction tests
 
 ### Archival Protocol Reference:
-See `guidelines-for-generating-tasks.md` (lines 13-61) for complete archival workflow.
+See `implementation-tasks-creation-guidelines.md` (lines 13-61) for complete archival workflow.
 
 ### Success Outcome:
 - Eliminated all text wrapping issues across viewport sizes

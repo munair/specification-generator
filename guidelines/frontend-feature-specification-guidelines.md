@@ -127,7 +127,7 @@ Consider these prompts:
 
 ## 5. Archival Cross-Reference
 
-**IMPORTANT**: When archiving implementation logs, follow the **ARCHIVAL PROTOCOL** in `guidelines-for-generating-tasks.md`.
+**IMPORTANT**: When archiving implementation logs, follow the **ARCHIVAL PROTOCOL** in `implementation-tasks-creation-guidelines.md`.
 
 Key requirements:
 1. Mark ALL tasks complete (`- [ ]` → `- [x]`)

@@ -149,7 +149,7 @@ Once we've identified the winning approach:
 ## Archival Note
 Once formalized and implemented, this exploration will follow standard archival:
 - Create formal PRD using domain-specific guideline
-- Generate task list with `guidelines-for-generating-tasks.md`
+- Generate task list with `implementation-tasks-creation-guidelines.md`
 - Follow ARCHIVAL PROTOCOL for completion
 - Tag with `[feature]-[breakthrough-pattern]`
 

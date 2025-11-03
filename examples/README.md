@@ -214,7 +214,7 @@ We're documenting additional real-world examples:
 - Moved to `/documentation/tasks/completed/`
 - Tagged: `persistent-display-css-grid-solution`
 
-**See**: `guidelines-for-generating-tasks.md` (lines 13-61) for complete ARCHIVAL PROTOCOL
+**See**: `implementation-tasks-creation-guidelines.md` (lines 13-61) for complete ARCHIVAL PROTOCOL
 
 ## The Domain Specificity Advantage
 

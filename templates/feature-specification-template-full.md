@@ -151,10 +151,10 @@ FR10: The API must [integration requirement]
 
 ## 15. Archival Cross-Reference
 
-**IMPORTANT**: When implementation is complete, follow the **ARCHIVAL PROTOCOL** in `guidelines-for-generating-tasks.md`.
+**IMPORTANT**: When implementation is complete, follow the **ARCHIVAL PROTOCOL** in `implementation-tasks-creation-guidelines.md`.
 
 ### Completion Workflow:
-1. **Generate task list** using `guidelines-for-generating-tasks.md`
+1. **Generate task list** using `implementation-tasks-creation-guidelines.md`
    - Output: `/documentation/tasks/active/implementing-[feature-name].md`
 2. **Implement all tasks** with full test coverage per domain testing approach
 3. **Mark ALL tasks complete** (`- [ ]` → `- [x]`)

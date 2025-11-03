@@ -104,7 +104,7 @@ These three guidelines help you create comprehensive Product Requirements Docume
 
 This guideline transforms approved PRDs into actionable implementation task lists:
 
-#### `guidelines-for-generating-tasks.md`
+#### `implementation-tasks-creation-guidelines.md`
 **Purpose**: Convert feature specifications into granular, atomic task lists for implementation
 
 **For Use With**:
@@ -160,7 +160,7 @@ Choose appropriate guideline (Backend, Frontend, or Exploratory) → AI establis
 **Guidelines**: `backend-feature-specification-guidelines.md`, `frontend-feature-specification-guidelines.md`, or `exploratory-feature-specification-guidelines.md`
 
 ### 2. Task Breakdown (Use Task Generation Guideline)
-Use `guidelines-for-generating-tasks.md` to transform approved PRD into granular, atomic implementation tasks
+Use `implementation-tasks-creation-guidelines.md` to transform approved PRD into granular, atomic implementation tasks
 
 **Process**: High-level plan approval → detailed sub-task generation → implementation tracking
 
@@ -174,7 +174,7 @@ Follow **ARCHIVAL PROTOCOL** (see below)
 
 ## The Archival Protocol
 
-**All three PRD guidelines** now include cross-references to the **ARCHIVAL PROTOCOL** in `guidelines-for-generating-tasks.md` (lines 13-61).
+**All three PRD guidelines** now include cross-references to the **ARCHIVAL PROTOCOL** in `implementation-tasks-creation-guidelines.md` (lines 13-61).
 
 ### Why This Matters
 
@@ -196,7 +196,7 @@ grep -c "- \[ \]" documentation/tasks/active/implementing-[feature-name].md
 # ^ Must return 0 before proceeding
 ```
 
-See `guidelines-for-generating-tasks.md` lines 13-61 for complete executable archival commands.
+See `implementation-tasks-creation-guidelines.md` lines 13-61 for complete executable archival commands.
 
 ## How to Use These Guidelines
 
@@ -287,7 +287,7 @@ All four guidelines now include:
 "Follow exploratory-feature-specification-guidelines.md to explore: [REQUEST]"
 
 # Task generation from approved PRD
-"Follow guidelines-for-generating-tasks.md to create implementation tasks for: [PRD FILE]"
+"Follow implementation-tasks-creation-guidelines.md to create implementation tasks for: [PRD FILE]"
 
 # Archival verification (before completing implementation)
 grep -c "- \[ \]" documentation/tasks/active/implementing-[feature-name].md

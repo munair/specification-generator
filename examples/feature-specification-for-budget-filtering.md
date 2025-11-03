@@ -89,7 +89,7 @@ This specification led to successful implementation in record time. The clear bo
 - **Key Pattern Applied**: Progressive disclosure preventing UI complexity
 
 ### Archival Protocol Reference:
-See `guidelines-for-generating-tasks.md` (lines 13-61) for complete archival workflow.
+See `implementation-tasks-creation-guidelines.md` (lines 13-61) for complete archival workflow.
 
 ### Success Outcome:
 - Implemented with zero scope expansion
