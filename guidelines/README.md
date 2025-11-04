@@ -60,6 +60,11 @@ These three guidelines help you create comprehensive Product Requirements Docume
 - State-managed UIs
 
 **Key Features**:
+- **Architectural Boundaries Framework (NEW in v3.0.0)** - Frontend vs backend decision making
+- **5-Question Decision Framework** - Systematic work placement
+- **Common Anti-Patterns** - Concrete wrong vs correct examples
+- **Architectural Audit Checklist** - Self-verification before finalization
+- **Mandatory [Backend/Frontend] prefix** in functional requirements
 - Component-based architecture patterns
 - React Context API and reducer patterns
 - Progressive disclosure principles
@@ -71,7 +76,7 @@ These three guidelines help you create comprehensive Product Requirements Docume
 
 **Testing Approach**: Component tests with React Testing Library, integration tests with context mocking, edge case coverage for UI states.
 
-**When to Use**: Any React/TypeScript feature, UI component, dashboard improvement, or user-facing functionality.
+**When to Use**: Any React/TypeScript feature, UI component, dashboard improvement, or user-facing functionality requiring frontend/backend work separation.
 
 ---
 
@@ -269,8 +274,8 @@ All four guidelines now include:
 - **1 Task Generation Guideline**: Transforms PRDs into implementation tasks
 - **Cross-References**: All PRD guidelines reference the ARCHIVAL PROTOCOL
 
-**Last Updated**: Monday, November 3, 2025
-**Framework Version**: Complete Framework (v2.1)
+**Last Updated**: Tuesday, November 4, 2025
+**Framework Version**: v3.0.0 - Architectural Decision Framework
 
 ---
 

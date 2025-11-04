@@ -20,18 +20,39 @@
 2. As a [user type], when [scenario], I need [capability]
 3. As a [user type], I expect [behavior] to [outcome]
 
+## Architectural Decisions
+
+**IMPORTANT**: For full-stack features, explicitly define frontend vs backend responsibilities.
+
+### Backend Work (if applicable)
+- [API endpoints needed]
+- [Data transformations and calculations]
+- [Business logic processing]
+- [Caching and optimization]
+
+### Frontend Work
+- [UI state management approach]
+- [Component structure and hierarchy]
+- [User interaction handling]
+- [Presentation logic]
+
+### Justification
+- [Why this work placement follows "Smart Backend, Simple Frontend" principle]
+- [Performance considerations]
+- [Future client support (mobile, desktop, etc.)]
+
 ## Functional Requirements
 
 ### Core Functionality
-FR1: The component must [display behavior]
-FR2: When user [interaction], the system must [response]
-FR3: The interface must [accessibility requirement]
-FR4: The component must NOT [prohibited behavior]
-FR5: State management must [consistency requirement]
+FR1: [Backend/Frontend]: The component must [display behavior]
+FR2: [Backend/Frontend]: When user [interaction], the system must [response]
+FR3: [Frontend]: The interface must [accessibility requirement]
+FR4: [Frontend]: The component must NOT [prohibited behavior]
+FR5: [Frontend]: State management must [consistency requirement]
 
 ### Progressive Disclosure
-FR6: Complex features must be [hidden by default | revealed on demand]
-FR7: Advanced options require [explicit user action]
+FR6: [Frontend]: Complex features must be [hidden by default | revealed on demand]
+FR7: [Frontend]: Advanced options require [explicit user action]
 
 ## Non-Goals (Explicit Boundaries)
 - This component does NOT [common misconception]
