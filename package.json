@@ -1,6 +1,6 @@
 {
   "name": "specification-generator",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "A framework for guiding AI assistants to create comprehensive feature specifications through structured creativity",
   "main": "README.md",
   "directories": {
