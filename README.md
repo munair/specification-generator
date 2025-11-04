@@ -17,6 +17,12 @@ This repository contains a battle-tested framework that solves both problems thr
 
 > **"First, build the fence. Then, explore every inch of the playground."**
 
+### Key Principles
+
+1. **Boundaries First, Creativity Second** - Define the fence before exploring the playground
+2. **Smart Backend, Simple Frontend** - Business logic on backend, presentation on frontend
+3. **Architectural Decision Making** - Systematic work placement prevents common AI mistakes
+
 ### How It Works
 
 The framework operates on a two-phase approach:
@@ -30,7 +36,13 @@ The AI assistant **must** establish clear boundaries before any creative work be
 #### Phase 2: Explore the Playground (Creative Abandon)
 Once boundaries are locked down, the AI assistant is encouraged to be **maximally creative and comprehensive** within those constraints.
 
-This approach leverages the AI's natural strengths (creativity, thoroughness, pattern recognition) while preventing its weaknesses (scope creep, assumption-making).
+#### Phase 1.5: Architectural Decision Making (NEW in v3.0.0)
+For full-stack applications, the framework now enforces **explicit architectural boundaries** between frontend and backend:
+- **Smart Backend, Simple Frontend** - Business logic belongs on backend
+- **5-Question Decision Framework** - Systematic placement of work
+- **Architectural Audit** - Self-verification before PRD finalization
+
+This approach leverages the AI's natural strengths (creativity, thoroughness, pattern recognition) while preventing its weaknesses (scope creep, assumption-making, architectural mistakes).
 
 ## Guideline Taxonomy: Domain-First Organization
 
@@ -56,11 +68,14 @@ The framework provides **three specialized guidelines** organized by domain and 
 **For**: React/TypeScript applications, UI components, user interfaces
 
 **Characteristics**:
+- **Architectural Boundaries Framework (NEW)** - Explicit frontend/backend separation
+- **5-Question Decision Framework** - Systematic work placement
 - Component-based architecture patterns
 - State management and context design
 - User experience and accessibility requirements
 - Visual design and responsive layout
 - Progressive disclosure and performance optimization
+- **Mandatory [Backend/Frontend] prefix** in functional requirements
 
 **Best for**: Web applications, dashboards, trading interfaces, user-facing features
 
@@ -176,6 +191,10 @@ The complete backend framework document containing:
 ### `guidelines/frontend-feature-specification-guidelines.md`
 
 The complete frontend framework document containing:
+- **Architectural Boundaries Framework (NEW)** - Frontend vs backend decision making
+- **5-Question Decision Framework** - Where should work happen?
+- **Common Anti-Patterns** - Concrete wrong vs correct examples
+- **Architectural Audit Checklist** - Self-verification before finalization
 - **Component Architecture** - React/TypeScript patterns
 - **State Management** - Context API and reducer patterns
 - **Progressive Disclosure** - Complexity management in UIs
@@ -244,6 +263,8 @@ These examples demonstrate the framework's evolution from theoretical guidelines
 ## Results You Can Expect
 
 Teams using this framework report:
+- **Architectural Consistency (NEW)** - Clear frontend/backend separation
+- **Prevention of Common AI Mistakes** - No more frontend calculations
 - **Faster specification cycles** - Less back-and-forth clarification
 - **More focused features** - Reduced scope creep and feature bloat
 - **Better AI collaboration** - Clearer expectations and outputs
@@ -272,8 +293,9 @@ The goal is simple: make AI assistants better partners in building great softwar
 ---
 
 **Framework Versions:**
+- **v3.0.0**: Architectural Decision Framework - Frontend/backend separation
 - Backend Guidelines: Optimized for serverless Lambda architecture
-- Frontend Guidelines: Optimized for React/TypeScript component systems
+- Frontend Guidelines: Optimized for React/TypeScript with architectural boundaries
 - Exploratory Guidelines: Constraint-free creative ideation
 
 *"The framework explicitly tells an AI Assistant: 'First, build the fence. Then, explore every inch of the playground.'"*
