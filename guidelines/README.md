@@ -21,6 +21,7 @@ Guidelines are now organized by **domain** (backend vs frontend) and **approach*
 ## The Framework Guidelines
 
 This directory contains **six essential guidelines** that form the complete feature development framework:
+
 ### PRD Generation Guidelines (4)
 These four guidelines help you create comprehensive Product Requirements Documents:
 

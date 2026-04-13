@@ -2,7 +2,9 @@
 
 This document is for **exploration, ideation, and creative overflow** before snapping back into a formal feature specification.  
 It is intentionally loose. Use it to let the agent (or the human writer) **wander the playground** before the fence goes up.
+
 ---
+
 ## 0. Agent-Era Exploration Model (v4.0.0)
 Exploration is no longer a pure thought exercise. A tool-using agent can **actually look around** before imagining solutions. Before answering any prompt below, the agent should:
 1. **Delegate an Explore subagent.** Spawn an Explore subagent with a bounded question like *"What does the current options chain ingestion flow look like, and where are the seams where a new indicator could be inserted?"* Let it range across the repository while the main agent preserves context for creative work.

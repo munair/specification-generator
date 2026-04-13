@@ -6,8 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [4.0.0] - Monday, April 13, 2026
+
 ### The Agent-Era Update
+
 All existing guidelines have been updated to assume a **tool-using coding agent** — not a chat-loop assistant. Two new guidelines and one new repository convention were added. Existing v3.x PRDs remain readable and valid; this release is tagged **4.0.0** because new v4.0.0-conformant PRDs expect a `WORKFLOW.md` policy file at the repository root, every PRD structure now includes an Agent Execution Plan section, the guideline taxonomy grew from four to six, and the recommended activation prompts changed. See [Why v4.0.0 is a Major Version](#why-v400-is-a-major-version) for the full list of expectations that shifted.
+
 ### Why This Major Version
 Over the 12 months since v3.0.0, coding agents gained capabilities the framework did not model:
 - **Tool use**: agents read files, run tests, grep the codebase, commit their own work
@@ -17,6 +20,7 @@ Over the 12 months since v3.0.0, coding agents gained capabilities the framework
 - **Skills / slash commands**: reusable capability bundles
 - **Long-running background agents**: orchestrators that consume issues from trackers
 v3.x guidelines treated the "AI assistant" as a single chat loop. v4.0.0 treats it as an **agent with tools, subagents, and policy-enforcing hooks**. The framework's philosophy — "build the fence, explore the playground" — is unchanged. What changed is who's holding the shovel.
+
 ### Added
 #### New Guideline: `system-specification-guidelines.md`
 A fifth guideline for specifying **multi-component systems**: orchestrators, daemons, long-running services, and anything with a non-trivial state machine. Fills a gap between feature-level PRDs (Backend, Frontend) and system-level specifications.
@@ -91,6 +95,7 @@ The task format example now includes:
 - `[parallel]` markers on independent phases
 - Explicit verification commands on every sub-task
 - Delegated Work summary section
+
 ### Changed
 - **README.md**: Major rewrite of the "Getting Started" section with v4.0.0 activation prompts, migration guide from v3.x, and explicit guidance on when to use the new System guideline. "What You'll Find Here" rewritten to include all six guidelines (previously listed only four). Stale v2.x Getting Started block removed. Doubled tagline consolidated. Marketing language thinned.
 - **guidelines/README.md**: Updated to document six guidelines (was four). Decision matrix gained rows for multi-component services, orchestrators, cross-Lambda coordination, streaming/real-time services, audit-sensitive features, and repository setup. Stale v3.x Quick Reference block removed — consolidated to one v4.0.0 block.
@@ -115,6 +120,7 @@ The task format example now includes:
   - Verified against a 33-case deny/allow test suite covering all of the above.
 - **`.claude/settings.json`** — matcher extended to cover `Task|WebFetch|WebSearch|NotebookEdit` (previously only `Read|Write|Edit|Bash|Grep|Glob`). `.env*` deny rules duplicated from `Read` to `Edit`/`Write`/`Grep`/`Glob` as defense-in-depth: if the hook script errors or is deleted, the permissions layer still blocks those tools.
 - **`guidelines/implementation-tasks-creation-guidelines.md` task-format example** — the fenced template had a dropped `### Relevant Files` header, an orphan bullet list outside the fence, and a stray trailing fence. An agent copying the template verbatim would have produced a malformed document. The fenced example now has `### Relevant Files` and `### Delegated Work` subsections inside the fence, the orphan block outside is removed, and the fence is balanced.
+
 ### Unchanged (Still Valid from v3.0.0)
 - The "build the fence, explore the playground" philosophy
 - The `[Backend/Frontend]` prefix requirement in functional requirements
@@ -123,6 +129,7 @@ The task format example now includes:
 - The ARCHIVAL PROTOCOL (now additionally hook-enforceable)
 - The Quick Start vs. Full PRD distinction
 - The `/documentation/specifications/active/ | completed/` and `/documentation/tasks/active/ | completed/` directory conventions. v4.0.0 also ships `.gitkeep` scaffolding so these directories exist on a fresh clone — previously the convention was documented but the directories had to be created by hand.
+
 ### Migration Guide: v3.x → v4.0.0
 **PRD format is not broken.** Existing v3.x PRDs remain valid. To fully adopt v4.0.0:
 1. **Copy `templates/workflow-template.md`** to your project root as `WORKFLOW.md`. Fill in test commands, branch policy, and project-specific rules.
@@ -177,7 +184,9 @@ Use Conventional Commits: `feat(scope): message`. Reference the PRD in the body.
 ```
 
 The testing, branch-policy, and commit-format sections are gone — they live in `WORKFLOW.md` and are enforced by hooks. Only the **work that is specific to this feature** remains in the PRD.
+
 ### What This Solves
+
 **Before v4.0.0**:
 - Every PRD repeated the same rules about test commands, commit style, and branch policy
 - Rules drifted between PRDs written at different times
@@ -185,6 +194,7 @@ The testing, branch-policy, and commit-format sections are gone — they live in
 - No home for multi-component system specifications
 - No mechanism to parallelize independent research or implementation work
 - No way to enforce deterministic rules beyond prose exhortation
+
 **After v4.0.0**:
 - Rules live in `WORKFLOW.md`, enforced by hooks, referenced by PRDs
 - Multi-component systems have a dedicated guideline with a proven section spine
@@ -192,8 +202,11 @@ The testing, branch-policy, and commit-format sections are gone — they live in
 - Parallelizable work is marked explicitly and delegated automatically
 - Workspace isolation is mandatory and specified in every PRD
 - Acceptance criteria are machine-verifiable test assertions, not prose judgments
+
 ### Inspiration
+
 The new System guideline's section spine was adapted from OpenAI's Symphony `SPEC.md` — a reference specification for a long-running agent-orchestration service. Symphony itself is not a guideline; it is an example of what a rigorous system-level spec looks like. This framework extracted its structure into a reusable template.
+
 ### Why v4.0.0 is a Major Version
 The underlying PRD format is not broken: v3.x PRDs remain readable and valid. v4.0.0 is released as a major version because producing a **v4.0.0-conformant** artifact requires expectations a v3.x project will not have in place:
 1. A `WORKFLOW.md` policy file at the repository root. Every v4.0.0 PRD references it; every activation prompt expects it.

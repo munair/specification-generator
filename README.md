@@ -53,6 +53,7 @@ This approach leverages the AI's natural strengths (creativity, thoroughness, pa
 
 ## What's New in v4.0.0
 v4.0.0 is a **major release** that upgrades every guideline for the agent-era execution model. Three things changed:
+
 ### 1. All existing guidelines now assume a tool-using agent
 Backend, Frontend, Exploratory, and Tasks guidelines each gained a new **Agent-Era Execution Model** section plus targeted updates throughout. The changes are surgical — the "build the fence, explore the playground" philosophy is intact — but every guideline now expects:
 - The agent has tools (reads files, runs tests, commits)
@@ -62,6 +63,7 @@ Backend, Frontend, Exploratory, and Tasks guidelines each gained a new **Agent-E
 - Work happens in an isolated workspace (branch or git worktree)
 - Requirements are machine-verifiable (test assertions, not prose judgments)
 PRDs written under v4.0.0 are shorter and more actionable because they **reference** project conventions instead of restating them.
+
 ### 2. New guideline: System-Level Specifications
 A new guideline — `system-specification-guidelines.md` — fills a gap in the taxonomy. The existing Backend and Frontend guidelines are optimized for single-feature PRDs (a Lambda handler, a React component). They are not the right tool for specifying a multi-component service with a state machine, concurrency, and observability.
 The new guideline uses a section spine adapted from OpenAI's Symphony `SPEC.md`, extended with cross-cutting system concerns:
@@ -80,6 +82,7 @@ The new guideline uses a section spine adapted from OpenAI's Symphony `SPEC.md`,
 13. Non-Goals
 14. Open Questions
 **Use it when**: you're specifying an orchestrator, daemon, long-running service, or any system with ≥ 3 communicating components. **Don't use it when**: you're specifying a single Lambda or a single React component — the Backend or Frontend guideline is the right fit there.
+
 ### 3. New convention: `WORKFLOW.md` as the in-repository policy contract
 v4.0.0 formalizes an in-repository policy file — `WORKFLOW.md` (or `CLAUDE.md`, `AGENTS.md`, `.cursorrules`, depending on your harness) — as the **single source of truth** for project-wide rules:
 - Test commands and pass criteria
@@ -92,8 +95,11 @@ v4.0.0 formalizes an in-repository policy file — `WORKFLOW.md` (or `CLAUDE.md`
 A reference template lives at `templates/workflow-template.md`. The companion guideline — `guidelines/workflow-file-guidelines.md` — explains how to integrate it.
 **Before v4.0.0**: Every PRD restated the same rules ("tests must pass before commit," "use Conventional Commits"). Rules drifted. Agents "forgot."
 **After v4.0.0**: Rules live in `WORKFLOW.md`. Hooks enforce them. PRDs reference them. Everything is shorter, more accurate, and automatically consistent.
+
 ---
+
 ## Getting Started with v4.0.0
+
 ### If you're new to the framework
 1. **Read this README** to understand the philosophy.
 2. **Copy `templates/workflow-template.md`** to your project root as `WORKFLOW.md`. Customize the test commands, branch policy, and commit style to match your project.
@@ -106,6 +112,7 @@ A reference template lives at `templates/workflow-template.md`. The companion gu
 5. **Activate the agent**: "Follow `guidelines/[name].md`. `WORKFLOW.md` is at the repository root. Feature request: [YOUR REQUEST]."
 6. **Let the agent use its tools first**. It should read `WORKFLOW.md`, grep the target directory, and delegate recon to subagents before asking you clarifying questions.
 7. **Approve and commit the PRD** at the critical checkpoint, then generate tasks with `guidelines/implementation-tasks-creation-guidelines.md`.
+
 ### If you're migrating from v3.x
 1. **Add `WORKFLOW.md` to your repo.** Copy the template, fill in your project's rules.
 2. **Wire up the reference hooks** from the template into `.claude/settings.json`.
@@ -113,6 +120,7 @@ A reference template lives at `templates/workflow-template.md`. The companion gu
 4. **Update your activation prompts** to mention `WORKFLOW.md`. Example: `"Follow frontend-feature-specification-guidelines.md. WORKFLOW.md is at the repository root. Feature request: ..."`
 5. **For your next system-level project** (an orchestrator, daemon, or multi-component service), use the new `system-specification-guidelines.md` instead of cramming it into a Backend PRD.
 6. **No PRD format break**: v4.0.0 does not change the `[Backend/Frontend]` prefix requirement from v3.0.0. Existing PRDs remain valid.
+
 ### New Activation Prompts
 ```bash
 # Backend feature (v4.0.0)
@@ -198,6 +206,7 @@ The framework now provides **six specialized guidelines** — four for PRD gener
 - Per-component testing matrix with verification commands
 - Designed for subagent-per-component parallel implementation
 **Best for**: Agent orchestrators, polling daemons, multi-Lambda workflows, any system with ≥ 3 communicating components
+
 ### The `WORKFLOW.md` Convention (NEW in v4.0.0)
 **Guideline**: `guidelines/workflow-file-guidelines.md`
 **Template**: `templates/workflow-template.md`
