@@ -382,6 +382,83 @@ See the `examples/` directory for two reference PRDs used to develop and validat
 
 These are illustrative, not exhaustive — use them as structural references when drafting your own PRDs.
 
+## The Case for Pseudocode in Specifications
+
+This framework treats **pseudocode as a first-class tool for specification authors**, not as a stylistic flourish. v4.0.2 added reference pseudocode blocks to two guidelines — [system-specification-guidelines.md](guidelines/system-specification-guidelines.md) for state-machine semantics and [implementation-tasks-creation-guidelines.md](guidelines/implementation-tasks-creation-guidelines.md) for the agent's PRD-execution loop. This section explains why.
+
+### What pseudocode is, in this framework
+
+Pseudocode here means **language-neutral, ordered, named-step descriptions of control flow**. It is structurally close to real code — `if`, `for`, `assert`, function calls, return values — but it is not bound to a syntax. A specification author writes it the same way regardless of whether the implementer will reach for TypeScript, Python, Go, Rust, or a state-machine library.
+
+It is **not** a flowchart, a UML sequence diagram, a sketch, or a "whatever feels right." Those are different tools for different jobs. Pseudocode lives in the gap between prose and real code: more rigorous than prose because it commits to ordering and error paths, more flexible than real code because it does not commit to types, libraries, or concurrency primitives.
+
+### Why pseudocode beats prose for the hard parts of a specification
+
+A natural-language sentence can hide an enormous amount of ambiguity behind verbs like "should," "handles," "ensures," and "before." Pseudocode forces those hedges out. Consider the difference between two specifications of the same audit-write rule:
+
+**Prose version**
+
+> "When a run attempt finishes, the audit writer should record the outcome before the workspace is released, and if the audit write fails the system handles the failure appropriately."
+
+**Pseudocode version**
+
+```
+function on_run_finished(run, outcome, workspace):
+    audit_writer.write(run, outcome.action)         // FAIL-CLOSED
+        // if write throws after retries, function aborts here;
+        // workspace is NOT released; run stays "active";
+        // operator is alerted via /status endpoint.
+
+    transition(run, "active" -> "finished")
+    workspace_manager.release(workspace)
+```
+
+The prose version permits at least four different correct implementations and at least four different incorrect ones — and the implementer cannot tell which is which from the sentence alone. The pseudocode version closes every ambiguity the prose left open: the audit write happens *before* the state transition, the workspace release is *gated on* the transition completing, and the failure path is explicit ("function aborts here"). An engineer reading the pseudocode knows what to build. An engineer reading the prose has to guess.
+
+### Pseudocode as a forcing function for the author
+
+The most underappreciated value of pseudocode is what it does to the **author**, not the reader. Writing pseudocode is the cheapest possible test of "do I actually understand this design?" If you cannot write the pseudocode, you do not yet understand the system well enough to specify it. The hand reaches for the keyboard, the keyboard demands ordering, and the ordering demands answers to questions the prose was hiding:
+
+- "When the audit write fails, does the workspace get released?"
+- "Is the state transition before or after the audit write?"
+- "Does the retry loop re-acquire the workspace, or reuse it?"
+- "What invariant must hold while we are between states?"
+
+Prose lets the author defer all of those questions. Pseudocode does not. A specification that goes through one round of "try to write the pseudocode" will be tighter than a specification that did not — every time, with no exceptions.
+
+### Pseudocode as a contract, not a translation
+
+Pseudocode in a specification is **not a translation hint** for the implementer. The implementer is not expected to type the pseudocode into a file and run it. The pseudocode is a *contract* — it pins down ordering, error paths, and invariants the implementer must preserve, while leaving the implementer free to choose the language, the data structures, the concurrency primitives, the test framework, and the deployment target.
+
+This distinction matters because it answers the most common objection to pseudocode in specifications: "we already have real code, why write fake code?" The answer is that **real code commits to too much**. Real code in a specification picks a language, a runtime, a set of dependencies, and a style — and every one of those choices imposes constraints on the implementer that the specification did not actually intend. Pseudocode is the right level of detail because it commits to the things that matter (ordering, invariants, error paths) and stays silent about the things that do not (syntax, libraries, types).
+
+### When to write pseudocode in your specifications
+
+The framework recommends pseudocode for:
+
+- **State machines** with non-trivial transitions, error paths, or concurrency rules. The system guideline's reference IssueState block is the canonical example.
+- **Algorithms** whose correctness depends on ordering — audit-write-before-transition, lock-acquire-before-read, validate-before-commit.
+- **Reconciliation logic** that runs on restart or recovery, where the failure modes are subtle and prose tends to gloss over them.
+- **Multi-step transactions** with rollback or compensating actions.
+- **Agent-execution loops** — how a tool-using agent consumes a PRD and turns it into committed code. The implementation-tasks guideline's reference loop is the canonical example.
+
+The framework recommends **against** pseudocode for:
+
+- **Simple CRUD endpoints** where the prose Functional Requirement is already unambiguous.
+- **UI rendering** where the visual result is the contract and ordering is less load-bearing than visual fidelity.
+- **Configuration shapes** — these are better expressed as schemas, not pseudocode.
+- **Anything that would require more than ~30 lines of pseudocode** — at that point the design is too detailed for a specification and should move into the implementation itself.
+
+### A reading order for the pseudocode in this repository
+
+If you want to see the framework's pseudocode discipline in action:
+
+1. **Start with the agent-execution loop** in [implementation-tasks-creation-guidelines.md](guidelines/implementation-tasks-creation-guidelines.md). It is short, concrete, and directly visible in every session of every adopting project — it is what the agent does when it consumes a PRD.
+2. **Then read the IssueState machine** in [system-specification-guidelines.md](guidelines/system-specification-guidelines.md) under "Reference Pseudocode." It demonstrates how pseudocode resolves the audit-write ordering question that the prose §7.7 hedges around.
+3. **Finally, look at how the worked example** [examples/system-specification-ticket-orchestrator-v4-example.md](examples/system-specification-ticket-orchestrator-v4-example.md) populates §5 and §7.7 *without* a pseudocode block — and ask yourself which questions the example leaves open that the guideline's pseudocode block would have closed. That gap is the answer to "should this real PRD have included pseudocode?"
+
+The discipline here is the same as the framework's larger philosophy: **build the fence, then explore the playground**. Pseudocode is one of the strongest fencing materials available — strong enough to stop ambiguity, light enough not to constrain creativity inside the fence.
+
 ## What the Framework Aims to Produce
 
 Teams using this framework aim for:
