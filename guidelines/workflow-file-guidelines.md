@@ -52,7 +52,7 @@ Include rules that apply to **every feature in this project**:
 - **Backend PRD**: The Agent Execution Plan section references `WORKFLOW.md` for test commands and branch policy.
 - **Frontend PRD**: Same as backend.
 - **Exploratory**: The recon subagent reads `WORKFLOW.md` as part of its initial survey.
-- **System Specification**: The "Workflow / Policy File" section *is* the system's own version of this convention — but for services, the file may contain richer schema.
+- **System Specification**: Note that `system-specification-guidelines.md` §4 "Service Policy / Configuration File" is a **different file** — it specifies a service's own operational configuration (for example, `config/scheduler.yaml` or `config/poller.yaml`) that the service reads at startup, and it is **not** the project-level `WORKFLOW.md` that tells the coding agent how to operate on the repository. A project has one `WORKFLOW.md`; a service has its own configuration file. In a single-service repository the two may collapse into one file in practice; in a multi-service repository they stay separate and are named distinctly so each service owns its configuration and the project owns `WORKFLOW.md`. See the naming note at the top of §4 in `system-specification-guidelines.md`.
 - **Implementation Tasks**: Task lists reference `WORKFLOW.md` for test commands and hook configuration. Deterministic rules go into hooks, not task descriptions.
 
 ## Getting Started
