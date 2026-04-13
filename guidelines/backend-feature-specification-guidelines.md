@@ -6,6 +6,20 @@ The framework explicitly tells an AI Assistant: "First, build the fence. Then, e
 
 **v4.0.0 update**: This guideline now assumes a **tool-using agent** — not a chat-loop assistant. The agent can read files, run tests, spawn subagents, execute commands in an isolated workspace, and enforce policy through hooks. The PRD must be written with that execution model in mind.
 
+## When to Use This Guideline (and When Not To)
+
+**Use this guideline for**: a single Lambda handler, a single API endpoint, a single data-pipeline step, or a focused enhancement to an existing service. Anything where the unit of work is one server-side feature with one owner, one branch, and one merge.
+
+**Do not use this guideline for**:
+
+- **A multi-component service** (orchestrator, daemon, scheduler, poller with its own state machine and concurrency rules) — use [`system-specification-guidelines.md`](system-specification-guidelines.md) instead. A backend PRD that grows a §State Machine and a §Concurrency Rules section is a system specification in disguise.
+- **A streaming transport** (SSE, WebSocket, long-poll, broker fan-out) — even if a single Lambda emits the stream, the transport contract belongs in [`system-specification-guidelines.md`](system-specification-guidelines.md) §6 because the consumer side, the reconnect semantics, and the backpressure policy are all cross-component concerns.
+- **An audit or compliance-relevant write path** — even if the audit row is written by one handler, the schema, retention, immutability, and fail-closed-vs-fail-open decision belong in [`system-specification-guidelines.md`](system-specification-guidelines.md) §7. The backend PRD references the system spec section that owns the write.
+- **A user-facing component or React feature** — use [`frontend-feature-specification-guidelines.md`](frontend-feature-specification-guidelines.md) instead.
+- **Creative ideation that has not yet narrowed to a target service** — use [`exploratory-feature-specification-guidelines.md`](exploratory-feature-specification-guidelines.md) first, then migrate to this guideline once the scope has narrowed.
+
+When the scope is ambiguous, prefer the more specific guideline. A backend PRD that grows cross-cutting sections is a sign the wrong guideline was picked — escalate to a system specification instead of cramming.
+
 ## Goal
 
 To guide a coding agent (and its subagents) in creating a detailed Backend Feature Specification / Product Requirements Document (PRD) in Markdown format, based on an initial user prompt. The PRD should be thorough, actionable, and suitable for a tool-using agent — or a junior developer — to implement the feature end to end: code, tests, commits, and archival.
@@ -112,40 +126,42 @@ The generated PRD should include the following sections:
 
 **Before finalizing the PRD, run this consolidated checklist.** It is the backend counterpart to the Final Audit in `frontend-feature-specification-guidelines.md` §5 — one structured pass covering placement, execution plan, and red flags. This audit is a review step the agent performs *on* the finished PRD before presenting it; its contents do not need to appear in the PRD itself.
 
+Each red-flag bullet below carries a stable identifier from [`specification-validation-vocabulary.md`](specification-validation-vocabulary.md) in parentheses. A reviewer subagent or a hook can cite those identifiers directly when reporting findings, instead of re-describing the failure in prose.
+
 ### Architectural Placement
 
-- ☐ Is every functional requirement prefixed `Backend:` and written as a verifiable assertion (HTTP status, response shape, measurable latency)?
-- ☐ Are all write endpoints that should be idempotent explicitly specified as idempotent, with the idempotency key or natural key named?
-- ☐ Does the handler stay within its own service boundary (no cross-Lambda reads, no hidden coupling to another handler's internal state)?
-- ☐ Is the error envelope specified — either by reference to an existing shared shape or, if truly new, defined explicitly — with every error code the endpoint can emit?
-- ☐ Does the response shape support future clients (mobile, API consumers) without reshaping, and is it projected from the data source in a way that does not lock out those future clients?
-- ☐ If the feature touches multiple tables or multiple services in one write, is the transactional story stated explicitly (atomic, compensating, eventually consistent) rather than assumed?
-- ☐ Is the IAM scope the feature requires the minimum the work actually needs — no "while we're at it" expansions?
-- ☐ Are streaming, real-time push, or cross-component state-machine requirements routed to `system-specification-guidelines.md` §6 rather than specified inline in a backend PRD?
-- ☐ Are audit-relevant operations routed to `system-specification-guidelines.md` §7 rather than handled ad hoc in this handler's success path?
+- ☐ Is every functional requirement prefixed `Backend:` and written as a verifiable assertion (HTTP status, response shape, measurable latency)? `(fr_not_verifiable)`
+- ☐ Are all write endpoints that should be idempotent explicitly specified as idempotent, with the idempotency key or natural key named? `(unspecified_idempotency)`
+- ☐ Does the handler stay within its own service boundary (no cross-Lambda reads, no hidden coupling to another handler's internal state)? `(distributed_state_in_backend_prd)`
+- ☐ Is the error envelope specified — either by reference to an existing shared shape or, if truly new, defined explicitly — with every error code the endpoint can emit? `(missing_error_envelope)`
+- ☐ Does the response shape support future clients (mobile, API consumers) without reshaping, and is it projected from the data source in a way that does not lock out those future clients? `(response_shape_driven_by_caller)`
+- ☐ If the feature touches multiple tables or multiple services in one write, is the transactional story stated explicitly (atomic, compensating, eventually consistent) rather than assumed? `(multi_table_no_transactional_story)`
+- ☐ Is the IAM scope the feature requires the minimum the work actually needs — no "while we're at it" expansions? `(iam_overreach)`
+- ☐ Are streaming, real-time push, or cross-component state-machine requirements routed to `system-specification-guidelines.md` §6 rather than specified inline in a backend PRD? `(streaming_in_backend_prd)`
+- ☐ Are audit-relevant operations routed to `system-specification-guidelines.md` §7 rather than handled ad hoc in this handler's success path? `(audit_in_backend_prd)`
 
 ### Agent Execution Plan
 
-- ☐ Is the branch or worktree name specified?
-- ☐ Is Delegatable Research broken out for Explore or Plan subagents, with each item bounded and expected to return a summary rather than raw file content?
-- ☐ Are the hooks that gate deterministic rules (pre-commit tests, lint, archival verification) named explicitly, and does the PRD assume they exist rather than restating the rules they enforce?
-- ☐ Does the PRD reference `WORKFLOW.md` (or `CLAUDE.md`) at the repository root rather than restating test commands, commit style, or branch policy inline?
-- ☐ Are the acceptance criteria machine-verifiable — every one of them runnable as a test assertion, `curl` invocation, or log-line match, with no prose judgments like "looks right" or "handles errors gracefully"?
+- ☐ Is the branch or worktree name specified? `(missing_branch_name)`
+- ☐ Is Delegatable Research broken out for Explore or Plan subagents, with each item bounded and expected to return a summary rather than raw file content? `(missing_delegatable_research)`
+- ☐ Are the hooks that gate deterministic rules (pre-commit tests, lint, archival verification) named explicitly, and does the PRD assume they exist rather than restating the rules they enforce? `(prose_deterministic_rule)`
+- ☐ Does the PRD reference `WORKFLOW.md` (or `CLAUDE.md`) at the repository root rather than restating test commands, commit style, or branch policy inline? `(workflow_content_restated)`
+- ☐ Are the acceptance criteria machine-verifiable — every one of them runnable as a test assertion, `curl` invocation, or log-line match, with no prose judgments like "looks right" or "handles errors gracefully"? `(acceptance_criteria_not_measurable)`
 
 ### Red Flags — Rewrite the PRD if Any Apply
 
-- "The handler should probably be idempotent" with no explicit specification of how idempotency is achieved.
-- A backend FR that is really a distributed-state or concurrency problem (cross-request coordination, multi-Lambda orchestration, streaming push) — these are system-level concerns and belong in a system specification, not a backend PRD.
-- Fail-open behavior on an audit-relevant write path where fail-closed is the correct choice. The audit section in `system-specification-guidelines.md` §7.7 is explicit that there is no third option; make the call.
-- Missing error envelope. A backend endpoint that emits errors without a documented shape is an endpoint that clients will parse differently across every integration.
-- Response shape driven by a specific current client's convenience rather than by the data source's natural projection. Response shape is a product decision that outlives any single caller; design it to be stable.
-- Secrets, tokens, or full request bodies surfacing in structured logs. PII and secrets never leave the request-handling boundary; logs carry redacted context, nothing more.
-- IAM overreach — a handler granted `dynamodb:*` when it needs `GetItem` on one table.
-- Prose rules the agent must "remember" — commit style, branch policy, test commands. These belong in hooks and in `WORKFLOW.md`, not in PRD narrative.
-- Restated `WORKFLOW.md` contents inline. If a section of the PRD could be deleted by copying one sentence from `WORKFLOW.md` into it, delete the section and reference the file instead.
-- Acceptance criteria that are not machine-verifiable. "The endpoint responds quickly" is not a criterion; "p95 latency under 50 ms in `test-lambda-latency` output" is.
-- A flat sequential task list in the PRD's Agent Execution Plan when the research work is genuinely parallelizable across independent Explore subagents.
-- Multi-table writes with no transactional story, no rollback path, and no reconciliation design on partial failure.
+- `(unspecified_idempotency)` "The handler should probably be idempotent" with no explicit specification of how idempotency is achieved.
+- `(distributed_state_in_backend_prd)` A backend FR that is really a distributed-state or concurrency problem (cross-request coordination, multi-Lambda orchestration, streaming push) — these are system-level concerns and belong in a system specification, not a backend PRD.
+- `(audit_semantics_not_chosen)` Fail-open behavior on an audit-relevant write path where fail-closed is the correct choice. The audit section in `system-specification-guidelines.md` §7.7 is explicit that there is no third option; make the call.
+- `(missing_error_envelope)` Missing error envelope. A backend endpoint that emits errors without a documented shape is an endpoint that clients will parse differently across every integration.
+- `(response_shape_driven_by_caller)` Response shape driven by a specific current client's convenience rather than by the data source's natural projection. Response shape is a product decision that outlives any single caller; design it to be stable.
+- `(secrets_in_logs)` Secrets, tokens, or full request bodies surfacing in structured logs. PII and secrets never leave the request-handling boundary; logs carry redacted context, nothing more.
+- `(iam_overreach)` IAM overreach — a handler granted `dynamodb:*` when it needs `GetItem` on one table.
+- `(prose_deterministic_rule)` Prose rules the agent must "remember" — commit style, branch policy, test commands. These belong in hooks and in `WORKFLOW.md`, not in PRD narrative.
+- `(workflow_content_restated)` Restated `WORKFLOW.md` contents inline. If a section of the PRD could be deleted by copying one sentence from `WORKFLOW.md` into it, delete the section and reference the file instead.
+- `(acceptance_criteria_not_measurable)` Acceptance criteria that are not machine-verifiable. "The endpoint responds quickly" is not a criterion; "p95 latency under 50 ms in `test-lambda-latency` output" is.
+- `(missing_parallel_markers)` A flat sequential task list in the PRD's Agent Execution Plan when the research work is genuinely parallelizable across independent Explore subagents.
+- `(multi_table_no_transactional_story)` Multi-table writes with no transactional story, no rollback path, and no reconciliation design on partial failure.
 
 ## Guiding Principles
 
