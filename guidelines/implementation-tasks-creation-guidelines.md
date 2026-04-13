@@ -2,7 +2,8 @@
 
 ## Goal
 
-To guide an AI assistant in creating a detailed, step-by-step task list in Markdown format based on an existing Feature Specification (sometimes referred to as a PRD). The task list should be granular enough to guide a developer through implementation.
+To guide a coding agent in creating a detailed, step-by-step task list in Markdown format based on an existing Feature Specification (sometimes referred to as a PRD). The task list should be granular enough to guide a tool-using agent — or a human developer — through implementation end to end.
+**v4.0.0 update**: Tasks are now executed by an **agent with tools**, not a chat-loop assistant. The agent reads files, runs tests, spawns subagents, and commits. Task lists must be written for that execution model — including which tasks are parallelizable, which are delegatable to subagents, and which are gated by hooks.
 
 ## Output
 
@@ -10,9 +11,18 @@ To guide an AI assistant in creating a detailed, step-by-step task list in Markd
 - **Location:** `/documentation/tasks/active/`
 - **Filename:** `implementing-[feature-name].md` (This file is renamed to `implementation-log-[feature-name].md` upon completion of all tasks).
 
+## Agent Execution Model (v4.0.0)
+Before generating any task list, the agent must understand how tasks will actually be executed:
+1. **The agent executes tasks directly.** Tasks are not suggestions for a human — they are instructions the main agent (or a subagent it spawns) will carry out. Write them in the imperative, with verifiable outcomes.
+2. **Tasks run in an isolated workspace.** All work happens on a feature branch or git worktree named after the feature. `main` is off-limits.
+3. **Hooks enforce deterministic rules.** The archival checklist, test-passing requirement, lint-clean requirement, and commit-format conventions should be wired into `settings.json` hooks — not re-specified in every task list. The task list should assume these hooks exist and reference them by name.
+4. **Parallelizable tasks should be marked.** Independent tasks (a utility module + its test, or two unrelated component edits) can be delegated to subagents that run in parallel. Mark them with `[parallel]`.
+5. **Delegatable research should be hoisted.** Any broad investigation the task list depends on (e.g., "find all callers of `formatCurrency`") should be a subagent task at the top of the list, not inline work that pollutes the main agent's context.
+6. **Every task has a verification step.** "Add function X" is incomplete. "Add function X; verify by running `node --test tests/utilities/x.test.cjs` and confirming all assertions pass" is complete.
+7. **The `WORKFLOW.md` / `CLAUDE.md` contract.** Before generating tasks, the agent must read `WORKFLOW.md` (or `CLAUDE.md`) at the repository root. That file defines test commands, commit style, hook configuration, and branch rules. Do not restate those rules in the task list — reference them.
 ## ⚠️ ARCHIVAL PROTOCOL ⚠️
-
-**READ THIS FIRST** - If you're archiving a completed task list, follow this checklist EXACTLY:
+**READ THIS FIRST** - If you're archiving a completed task list, follow this checklist EXACTLY.
+**v4.0.0 note**: As of v4.0.0, the archival protocol should be wired into a `Stop` or `SessionEnd` hook in `settings.json` that runs the verification commands automatically. The hook is the source of truth; this checklist documents what the hook enforces. If the hook is not yet wired up, the agent must run this checklist manually. See `templates/workflow-template.md` for the reference hook configuration.
 
 ### When All Implementation Tasks Are Complete:
 
@@ -192,24 +202,40 @@ Backend tests should be dependency-free and follow these principles:
     -   **Integration Tests (`tests/integration/`):** Verify successful orchestration of multiple modules, particularly the main `index.cjs` handler. External system dependencies (APIs) must be mocked.
     -   **Architectural Tests (`tests/architecture/`):** Enforce high-level rules and conventions for the entire codebase, such as circular dependency detection.
 
-## Task Format Example
+## Task Format Example (v4.0.0)
 
 ```markdown
 # Implementation Log: [Feature Name]
 
-This document provides a granular, atomic checklist for implementing the new feature as outlined in the `feature-specification-[feature-name].md`.
+This document provides a granular, atomic checklist for implementing the feature as outlined in `feature-specification-[feature-name].md`.
+**Branch**: `feature/[feature-name]`
+**Workflow**: See `WORKFLOW.md` at repository root for test commands, commit style, and hooks.
+**Required Hooks**: `PreToolUse(Bash:git commit)` runs tests; `Stop` verifies archival checkboxes.
 
 ---
 
-### Phase 1: [First High-Level Task Title]
-
-- [ ] 1.1 [Sub-task description 1.1]
-- [ ] 1.2 [Sub-task description 1.2]
-
-### Phase 2: [Second High-Level Task Title]
-
-- [ ] 2.1 [Sub-task description 2.1]
-- [ ] 2.2 [Sub-task description 2.2]
+### Phase 0: Recon (subagent-delegated, parallel)
+- [ ] 0.1 [Explore subagent] Map all callers of `formatCurrency` across `/lambdas/` and report affected handlers.
+- [ ] 0.2 [Explore subagent] Audit DynamoDB access patterns for the `accounts` table; report any queries that would collide with the new GSI.
+### Phase 1: [First High-Level Task Title] [parallel with Phase 2]
+- [ ] 1.1 Add `utilities/new-utility.cjs` with function `X(input)`. **Verify**: `node --test tests/utilities/new-utility.test.cjs` exits 0.
+- [ ] 1.2 Add corresponding unit test covering null/empty/valid input cases. **Verify**: test count increases by 3.
+### Phase 2: [Second High-Level Task Title] [parallel with Phase 1]
+- [ ] 2.1 Update `index.cjs` to call `X` in the response path. **Verify**: integration test `tests/integration/feature-name.test.cjs` passes.
+- [ ] 2.2 Update error handler to propagate `X` failures as HTTP 422. **Verify**: curl test returns 422 for malformed input.
+### Phase 3: Archival (hook-enforced)
+- [ ] 3.1 Confirm `grep -c "- \[ \]" documentation/tasks/active/implementing-[feature-name].md` returns 1 (this line).
+- [ ] 3.2 Rename `implementing-` → `implementation-log-` and move to `documentation/tasks/completed/`.
+- [ ] 3.3 Commit archival (Stop hook will block if any checkbox above is unchecked).
+---
+- `index.cjs`
+- `utilities/new-utility.cjs`
+- `tests/utilities/new-utility.test.cjs`
+- `tests/integration/feature-name.test.cjs`
+### Delegated Work
+- Phase 0 tasks run as Explore subagents in parallel before Phase 1 begins.
+- Phase 1 and Phase 2 are independent and can run as parallel subagents.
+```
 
 ---
 

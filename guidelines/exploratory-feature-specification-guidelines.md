@@ -1,7 +1,15 @@
 # Freeform Specification Generator
 
 This document is for **exploration, ideation, and creative overflow** before snapping back into a formal feature specification.  
-It is intentionally loose. Use it to let the AI (or the human writer) **wander the playground** before the fence goes up.
+It is intentionally loose. Use it to let the agent (or the human writer) **wander the playground** before the fence goes up.
+---
+## 0. Agent-Era Exploration Model (v4.0.0)
+Exploration is no longer a pure thought exercise. A tool-using agent can **actually look around** before imagining solutions. Before answering any prompt below, the agent should:
+1. **Delegate a reconnaissance subagent.** Spawn an Explore subagent with a bounded question like *"What does the current options chain ingestion flow look like, and where are the seams where a new indicator could be inserted?"* Let it range across the repository while the main agent preserves context for creative work.
+2. **Run cheap experiments.** If an idea is testable in under 30 seconds (hit an API, parse a file, run a one-liner), run it. Exploration used to be speculation; now it can be small, real measurements.
+3. **Read adjacent prior art.** Grep the `examples/` and `documentation/specifications/completed/` directories for features that flirted with similar territory. Learn from what was tried.
+4. **Keep the creative context clean.** Do not let recon findings crowd out imagination. Summarize subagent findings into 3–5 bullet points before resuming the creative sections below.
+Exploration is **broader** and **cheaper** than it was in v3.x — use subagents to expand breadth without losing focus.
 
 ---
 
@@ -49,6 +57,11 @@ It is intentionally loose. Use it to let the AI (or the human writer) **wander t
 
 - Any stray thoughts, side ideas, or "what-ifs" to capture now.  
 - Even if they don't fit, record them here for later pruning.  
+
+---
+
+## 6.5 Recon Findings (v4.0.0)
+Paste the summarized output of any Explore subagents here. Keep it short (bullets, not essays). These findings should inform — but not constrain — the creative sections above. If a subagent reveals that a wild idea is already half-built in the codebase, note it here and celebrate; if it reveals a hidden constraint, note that too.
 
 ---
 

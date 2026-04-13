@@ -2,6 +2,8 @@
 
 This directory contains the complete framework for generating high-quality feature specifications, organized by domain and approach.
 
+> **v4.0.0**: The framework now contains **six guidelines** plus the `WORKFLOW.md` convention. New additions: `system-specification-guidelines.md` (multi-component services) and `workflow-file-guidelines.md` (in-repository policy contract). All existing guidelines have been updated for the agent-era execution model.
+
 ## Domain-First Organization
 
 Guidelines are now organized by **domain** (backend vs frontend) and **approach** (systematic vs exploratory) for maximum clarity and precision.
@@ -18,11 +20,9 @@ Guidelines are now organized by **domain** (backend vs frontend) and **approach*
 
 ## The Framework Guidelines
 
-This directory contains **four essential guidelines** that form the complete feature development framework:
-
-### PRD Generation Guidelines (3)
-
-These three guidelines help you create comprehensive Product Requirements Documents:
+This directory contains **six essential guidelines** that form the complete feature development framework:
+### PRD Generation Guidelines (4)
+These four guidelines help you create comprehensive Product Requirements Documents:
 
 #### `backend-feature-specification-guidelines.md`
 **Domain**: Lambda functions, APIs, data processing, backend services
@@ -105,6 +105,27 @@ These three guidelines help you create comprehensive Product Requirements Docume
 
 ---
 
+#### `system-specification-guidelines.md` (NEW in v4.0.0)
+**Domain**: Multi-component services, orchestrators, daemons, long-running systems
+**For Use With**:
+- Agent orchestration services (Symphony-style)
+- Polling daemons and schedulers
+- Cross-Lambda coordination layers
+- Any system with ≥ 3 communicating components
+- Services with non-trivial state machines
+**Key Features**:
+- Symphony-inspired section spine (Problem → Architecture → Domain Model → State Machine → Safety → Observability → Testing Matrix)
+- Explicit component table with responsibility, inputs, outputs, lifecycle
+- Stable identifier discipline (internal IDs vs. display IDs)
+- Forward-compatible schema (unknown keys ignored with a warning)
+- Per-component testing matrix with verification commands
+- Designed for subagent-per-component parallel implementation
+- Explicit "Extensibility" section as first-class requirement
+**Testing Approach**: Per-component unit tests + integration tests + real-system smoke test, all enforced by hooks on the full testing matrix.
+**When to Use**: Whenever the Backend or Frontend guideline feels too small for what you're building — specifically, when you're specifying a service rather than a feature.
+**When NOT to Use**: Single Lambda, single React component, or any feature that fits in one file. Use Backend or Frontend instead.
+---
+
 ### Task Generation Guideline (1)
 
 This guideline transforms approved PRDs into actionable implementation task lists:
@@ -138,6 +159,18 @@ This guideline transforms approved PRDs into actionable implementation task list
 
 **Output**: `/documentation/tasks/active/implementing-[feature-name].md`
 
+---
+
+### Convention Guideline (1) — NEW in v4.0.0
+#### `workflow-file-guidelines.md`
+**Purpose**: Define and integrate the `WORKFLOW.md` in-repository policy file.
+**For Use With**: Any project where a coding agent will operate across multiple features.
+**Key Features**:
+- Defines what belongs in `WORKFLOW.md` (test commands, branch policy, commit style, hook configuration, subagent delegation defaults, archival reference)
+- Defines what does NOT belong in `WORKFLOW.md` (feature-specific requirements, one-off instructions)
+- Forward compatibility rule: unknown keys ignored with a warning
+- Reference template at `templates/workflow-template.md`
+**When to Use**: Once per project, at repository setup time. Then reference from every PRD.
 ---
 
 ## Decision Matrix: Which Guideline to Use?
@@ -270,12 +303,13 @@ All four guidelines now include:
 - ✅ Complete ARCHIVAL PROTOCOL in task generation guideline
 
 **Framework Structure**:
-- **3 PRD Generation Guidelines**: Backend, Frontend, Exploratory
+- **4 PRD Generation Guidelines**: Backend, Frontend, Exploratory, System (v4.0.0)
 - **1 Task Generation Guideline**: Transforms PRDs into implementation tasks
+- **1 Convention Guideline**: `workflow-file-guidelines.md` — in-repository policy contract (v4.0.0)
 - **Cross-References**: All PRD guidelines reference the ARCHIVAL PROTOCOL
 
-**Last Updated**: Tuesday, November 4, 2025
-**Framework Version**: v3.0.0 - Architectural Decision Framework
+**Last Updated**: Friday, April 10, 2026
+**Framework Version**: v4.0.0 - Agent-Era Update
 
 ---
 
@@ -296,5 +330,32 @@ All four guidelines now include:
 
 # Archival verification (before completing implementation)
 grep -c "- \[ \]" documentation/tasks/active/implementing-[feature-name].md
-# ^ Must return 0 before archiving
+**Quick Reference Commands (v4.0.0)**:
+```bash
+# Backend PRD activation (v4.0.0 — references WORKFLOW.md, uses subagents)
+"Follow guidelines/backend-feature-specification-guidelines.md for a Lambda function.
+Read WORKFLOW.md at the repository root first. Use Explore subagents for codebase-wide research.
+Feature request: [REQUEST]"
+# Frontend PRD activation (v4.0.0)
+"Follow guidelines/frontend-feature-specification-guidelines.md for a React component.
+Read WORKFLOW.md at the repository root first. Use Explore subagents for component-tree audits.
+Feature request: [REQUEST]"
+# System-level spec activation (NEW in v4.0.0)
+"Follow guidelines/system-specification-guidelines.md for a multi-component service.
+Read WORKFLOW.md at the repository root first. Use a Plan subagent to review the draft
+architecture before finalizing. System description: [DESCRIPTION]"
+# Exploratory PRD activation (v4.0.0 — with recon subagents)
+"Follow guidelines/exploratory-feature-specification-guidelines.md. Spawn an Explore
+subagent first to survey the codebase for adjacent prior art. Topic: [REQUEST]"
+# Task generation from approved PRD (v4.0.0)
+"Follow guidelines/implementation-tasks-creation-guidelines.md for PRD at [PRD FILE].
+Spawn recon subagents for the PRD's Delegatable Research before proposing the plan."
+# Repository setup (NEW in v4.0.0 — one-time per project)
+"Follow guidelines/workflow-file-guidelines.md. Copy templates/workflow-template.md
+to the repository root as WORKFLOW.md and customize for this project. Then wire up the
+reference hooks in .claude/settings.json."
+# Archival verification (hook-enforced in v4.0.0)
+grep -c "- \[ \]" documentation/tasks/active/implementing-[feature-name].md
+# ^ Must return 0 before archiving. The Stop hook enforces this automatically
+#   if wired up per templates/workflow-template.md.
 ```

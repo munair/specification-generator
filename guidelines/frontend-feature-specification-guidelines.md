@@ -1,9 +1,20 @@
-# Rule: Feature Specification / Product Requirements Document (PRD)
+# Rule: Frontend Feature Specification / Product Requirements Document (PRD)
 
 ## Overview
 The framework explicitly tells an AI Assistant: "First, build the fence. Then, explore every inch of the playground."
 
-**NEW**: This framework now includes explicit architectural guidance to prevent frontend/backend responsibility misplacement.
+**v3.0.0**: Architectural guidance to prevent frontend/backend responsibility misplacement.
+**v4.0.0 update**: This guideline now assumes a **tool-using agent** — not a chat-loop assistant. The agent can read components, run Vitest, spawn subagents, open a preview build, and commit its own work. PRDs must be written for that execution model.
+---
+## 0. Agent-Era Execution Model (v4.0.0)
+Before writing a PRD, assume the following about the agent that will consume it:
+1. **The agent has tools.** It can read TSX files, run `npm test`, grep the component tree, open a dev server, and commit. Frontend PRDs should reference those tools by name where relevant (e.g., "agent will run `npm test -- ComponentName.test.tsx` before committing").
+2. **The agent can spawn subagents.** Delegate broad component-tree audits, prop-drilling investigations, accessibility sweeps, and design-system conformance checks to Explore subagents. Keep the main agent focused on the feature's critical path.
+3. **The agent honors in-repo policy.** A `WORKFLOW.md` or `CLAUDE.md` at the repo root encodes test commands, commit style, and branch rules. Reference it — don't repeat it.
+4. **Hooks enforce deterministic rules.** "Tests must pass before commit," "No `any` types in new files," "Accessibility audit before merge" — these belong in `settings.json` hooks, not PRD prose.
+5. **Work happens in an isolated workspace** — a dedicated branch or git worktree per feature. Never assume `main`.
+6. **Requirements are machine-verifiable.** Prefer "component renders with `role=button` and responds to `Enter` / `Space`" over "component is accessible."
+Any PRD section that restates rules already in `WORKFLOW.md`/`CLAUDE.md` should be deleted. The agent will read those files.
 
 ---
 
@@ -145,6 +156,14 @@ FR3: Frontend: Display comparison data from single API response
 
 ## 3. Clarifying Questions Framework
 
+### Before Asking Anything — Use Tools First (v4.0.0)
+The agent must **read before it asks**:
+- Read `CLAUDE.md` / `WORKFLOW.md` at the repo root for project conventions.
+- Grep for existing components/hooks/contexts that solve a similar problem.
+- Read the nearest sibling component to the target change for naming and style conventions.
+- Run the test command once to confirm the baseline is green.
+Only then ask questions about things the codebase genuinely cannot answer.
+
 ### Essential (Always Verify If Not Clear)
 - **Boundaries:** What should this feature *not* do? Any explicit non-goals?
 - **Phasing:** Should this be broken into phases or iterations?
@@ -156,15 +175,21 @@ FR3: Frontend: Display comparison data from single API response
 - **Failure & Recovery:** How should rollback, data migration failures, or partial deployments be handled?
 - **Testing Requirements:** What critical behaviors, user flows, and edge cases must be tested?
 - **Success Metrics:** How will we measure success (both quantitative and qualitative)?
+- **Agent Orchestration (NEW):** Which stages should run as subagents? Which hooks should gate commits? Is a separate visual-regression agent needed?
 
 **For Complex Features - Boundary Checklist:**
 - ☐ Have we listed 3-5 explicit things this feature will NOT do?
 - ☐ Have we defined Phase 1 (minimal viable) vs Phase 2+ (future enhancements)?
 - ☐ Have we identified all system integrations and dependencies?
+- ☐ Have we explicitly assigned work to backend vs frontend with justification?
+- ☐ Have we verified no frontend data aggregation or heavy computation?
 - ☐ **NEW**: Have we explicitly assigned work to backend vs frontend with justification?
 - ☐ **NEW**: Have we verified no frontend data aggregation or heavy computation?
 - ☐ Have we outlined clear acceptance criteria?
 - ☐ Have we defined success metrics with failure thresholds?
+- ☐ **v4.0.0**: Have we identified delegatable research for Explore subagents?
+- ☐ **v4.0.0**: Have we named the branch/worktree and relevant hooks?
+- ☐ **v4.0.0**: Are acceptance criteria machine-verifiable (test assertions, not prose)?
 
 ### Scope Control (Ask When Needed)
 - **Problem/Goal:** What specific problem does this solve for users?
@@ -205,7 +230,8 @@ Consider these prompts:
 4. **Functional Requirements** – Numbered list with [Backend/Frontend] prefix
 5. **Non-Goals** – What it won't do
 6. **Testing Considerations** – Key test scenarios
-7. **Success Metrics** – How we'll measure success
+7. **Agent Execution Plan** – Branch name, delegatable subagent tasks, relevant hooks (v4.0.0)
+8. **Success Metrics** – How we'll measure success
 
 ### Full PRD (Comprehensive)
 1. **Introduction/Overview** – Feature description and problem it solves
@@ -224,8 +250,9 @@ Consider these prompts:
 9. **Technical Considerations** *(Optional)* – Architecture, dependencies, constraints
 10. **Failure & Recovery Strategy** – Rollback plan, error handling, data recovery
 11. **Testing Considerations** – Unit, integration, edge cases, critical user flows
-12. **Success Metrics** – Quantitative and qualitative measures
-13. **Open Questions** – Unresolved items needing future clarification
+12. **Agent Execution Plan (v4.0.0)** – Branch/worktree name, delegatable subagent research (Explore/Plan), hooks gating commits and merges, and an explicit pointer to `WORKFLOW.md`/`CLAUDE.md` rather than repeating its rules
+13. **Success Metrics** – Quantitative and qualitative measures; prefer measures the agent can verify
+14. **Open Questions** – Unresolved items needing future clarification
 
 ---
 
@@ -257,6 +284,20 @@ Consider these prompts:
 - Multiple API calls from frontend to achieve one feature
 - Frontend doing data normalization or transformation
 - Complex business logic in React components
+
+### PRD Review Checkpoint: Agent Orchestration Audit (v4.0.0)
+**Before finalizing PRD, audit the execution plan:**
+☐ Is the branch/worktree name specified?
+☐ Are hooks identified for deterministic rules (tests, linting, accessibility)?
+☐ Is delegatable research broken out for Explore/Plan subagents?
+☐ Does the PRD reference `WORKFLOW.md`/`CLAUDE.md` instead of restating it?
+☐ Are acceptance criteria machine-verifiable (test assertions, not prose)?
+☐ Does the PRD avoid instructing the agent to "always remember" things? (Those go in hooks.)
+**Red Flags**:
+- Prose rules the agent must "remember" — should be a hook
+- Acceptance criteria like "looks polished" — not machine-verifiable
+- Restating commit-message or test-command conventions inline
+- A flat task list the main agent must run sequentially when subagents could parallelize research
 
 ### Supporting Documentation Guidelines
 - **User Guides** – Create for all user-facing features to ensure adoption and proper usage
