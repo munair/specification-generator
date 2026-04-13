@@ -172,6 +172,28 @@ This guideline transforms approved PRDs into actionable implementation task list
 - Forward compatibility rule: unknown keys ignored with a warning
 - Reference template at `templates/workflow-template.md`
 **When to Use**: Once per project, at repository setup time. Then reference from every PRD.
+
+---
+
+### Validation Vocabulary (1) — NEW in v4.0.2
+
+#### `specification-validation-vocabulary.md`
+
+**Purpose**: A named failure taxonomy for specification reviews. Every failure mode a reviewer (human or subagent) can flag when auditing a PRD, system specification, task list, or `WORKFLOW.md` has a stable identifier here, a one-line description, the guideline and section it belongs to, an example of the failure, and an example of the fix. Adapted from OpenAI's Symphony `SPEC.md` §5.5 error-taxonomy pattern.
+
+**For Use With**: Any specification review. The Final Audit section in each PRD guideline now references vocabulary codes in parentheses after each red-flag bullet.
+
+**Key Features**:
+- Cross-guideline codes (apply to any PRD): `missing_non_goals`, `fr_not_verifiable`, `workflow_content_restated`, `acceptance_criteria_not_measurable`, etc.
+- Backend-specific codes: `missing_error_envelope`, `unspecified_idempotency`, `iam_overreach`, `streaming_in_backend_prd`, `audit_in_backend_prd`, etc.
+- Frontend-specific codes: `frontend_calculates`, `sequential_hydration`, `frontend_streaming_spec`, `spanning_requirement_not_split`, etc.
+- System-specific codes: `missing_component_table`, `missing_state_machine`, `audit_semantics_not_chosen`, `missing_test_matrix_row`, `streaming_no_backpressure_policy`, etc.
+- Tasks and Workflow-file codes: `task_no_verification_step`, `missing_parallel_markers`, `missing_workflow_file`, etc.
+- Conformance profiles (Core / Extension / Integration) for tiering audits by specification type
+- Forward-compatibility rule: unknown codes in audit output are ignored with a warning, never rejected
+
+**When to Use**: Every time a reviewer (human or subagent) flags a finding. Cite the code; the code links to the guideline section that owns it.
+
 ---
 
 ## Decision Matrix: Which Guideline to Use?
