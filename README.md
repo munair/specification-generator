@@ -68,7 +68,7 @@ The new guideline uses a section spine adapted from OpenAI's Symphony `SPEC.md`,
 1. Problem & Goals
 2. System Architecture (component table)
 3. Domain Model (with stable IDs)
-4. Service Policy / Config File (distinct from project `WORKFLOW.md`)
+4. Service Policy / Configuration File (distinct from project `WORKFLOW.md`)
 5. State Machine & Orchestration
 6. **Streaming Transports** — SSE/WebSocket/long-poll, backpressure, reconnect/resume, heartbeat
 7. **Audit & Compliance Records** — schema, retention, immutability, fail-closed vs. fail-open write path

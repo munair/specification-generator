@@ -22,7 +22,7 @@ System-level work is the most natural home for agent orchestration:
 1. **Receive Prompt** – User describes a system they want built (e.g., "a service that polls an issue tracker and runs a coding agent on each ticket in an isolated workspace").
 2. **Read the Landscape** – Before anything else, use the Explore subagent to survey existing adjacent services, shared libraries, and deployment patterns.
 3. **Clarify Boundaries First** – Same "build the fence" discipline as Backend/Frontend: non-goals, phasing, integration seams. System specs fail hardest when scope is not nailed down.
-4. **Draft the Spec** – Use the section spine below. Write for extensibility: unknown configuration  keys should be ignored, new components should be addable without breaking existing ones.
+4. **Draft the Spec** – Use the section spine below. Write for extensibility: unknown configuration keys should be ignored, new components should be addable without breaking existing ones.
 5. **Delegate Review** – Before finalizing, send the draft to a Plan subagent for independent architectural review. Fold findings back in.
 6. **Review, Approve, Commit** – Same critical checkpoint as all other guidelines. Do not begin implementation until the spec is committed.
 7. **Archive on Completion** – Follow the ARCHIVAL PROTOCOL in `implementation-tasks-creation-guidelines.md`.
@@ -54,9 +54,9 @@ List the entities the system reasons about. For each:
 - **Identity** (how it is uniquely identified — internal ID vs. human-readable ID)
 - **Lifecycle** (created, transitioned, retired)
 Distinguish stable internal IDs from display-facing identifiers. This matters for logs, retries, and reconciliation.
-### 4. Service Policy / Config File
+### 4. Service Policy / Configuration File
 
-> **Naming note.** This section is about the **service's own in-repository config/policy file** — the thing this service reads at startup. It is **not** the project-level `WORKFLOW.md` that tells the coding agent how to operate on this codebase. A project has one `WORKFLOW.md` (or `CLAUDE.md`/`AGENTS.md`) that lives alongside all of its code; a service has its own configuration  file that encodes *operational* policy. In some small projects they collapse to the same file. In larger projects (multiple services in one repo), keep them separate and name them distinctly (e.g., `config/scheduler.yaml`, `config/poller.yaml`).
+> **Naming note.** This section is about the **service's own in-repository config/policy file** — the thing this service reads at startup. It is **not** the project-level `WORKFLOW.md` that tells the coding agent how to operate on this codebase. A project has one `WORKFLOW.md` (or `CLAUDE.md`/`AGENTS.md`) that lives alongside all of its code; a service has its own configuration file that encodes *operational* policy. In some small projects they collapse to the same file. In larger projects (multiple services in one repo), keep them separate and name them distinctly (e.g., `config/scheduler.yaml`, `config/poller.yaml`).
 
 If the service reads operational policy from a file in the repository (highly recommended), specify:
 - **Filename and location** (`config/[service-name].yaml`, `[service-name]-policy.md`, etc.)
@@ -223,7 +223,7 @@ Every component needs a row. Every row needs a verification command.
 
 | Component        | Test Type         | Verification Command                            | Green When                           |
 |------------------|-------------------|-------------------------------------------------|--------------------------------------|
-| Config Loader    | Unit              | `node --test tests/config-loader.test.js`       | All assertions pass                  |
+| Configuration Loader    | Unit              | `node --test tests/config-loader.test.js`       | All assertions pass                  |
 | Tracker Client   | Integration       | `node --test tests/tracker-client.test.js`      | Returns normalized issue list        |
 | Orchestrator     | State-machine     | `node --test tests/orchestrator.test.js`        | All transitions fire correctly       |
 | Stream Encoder   | Unit              | `node --test tests/stream-encoder.test.js`      | Round-trips all message types        |
@@ -243,7 +243,7 @@ A test matrix is the agent-era replacement for "we'll write tests later."
 ### 12. Extensibility
 Document how to add:
 - A new component
-- A new field to the service policy/configuration  file
+- A new field to the service policy/configuration file
 - A new state to the state machine
 - A new streaming message type (forward compatibility)
 - A new audit event type (schema migration)
@@ -264,9 +264,9 @@ Items the spec cannot yet resolve. Each should have an owner and a resolution da
 A system spec for "a service that orchestrates coding agents against an issue tracker" would use this spine like so:
 
 1. **Problem & Goals**: Eliminate manual ticket pickup; run agents in isolated workspaces; keep policy in-repo.
-2. **Architecture**: Config Loader → Tracker Client → Orchestrator → Workspace Manager → Agent Runner → Logging Surface.
+2. **Architecture**: Configuration Loader → Tracker Client → Orchestrator → Workspace Manager → Agent Runner → Logging Surface.
 3. **Domain Model**: Issue, WorkflowDefinition, ServiceConfig, Workspace, RunAttempt, LiveSession, RetryEntry, RuntimeState.
-4. **Service Policy / Config File**: `config/orchestrator.yaml` with required and optional fields; unknown keys ignored. Separate from the project `WORKFLOW.md`.
+4. **Service Policy / Configuration File**: `config/orchestrator.yaml` with required and optional fields; unknown keys ignored. Separate from the project `WORKFLOW.md`.
 5. **State Machine**: IssueState (queued → running → completed/failed); RunAttempt (scheduled → active → finished); retry with exponential backoff.
 6. **Streaming Transports**: SSE feed of live run-log frames to the operator dashboard; last-seen-ID resume; 30s heartbeat; slow-consumer disconnect after 60s.
 7. **Audit & Compliance Records**: Immutable record per RunAttempt (actor=agent-id, subject=issue-id, outcome=success/failure); 1-year retention; fail-closed on audit-write error.
@@ -280,7 +280,7 @@ This is not a reprint of Symphony's spec — it's what the spec looks like when 
 ## Guiding Principles
 - **Structure Over Prose**: Tables, state diagrams, and enumerated lists beat narrative paragraphs at the system level.
 - **Stable IDs First**: Before writing the state machine, nail down how entities are identified.
-- **Forward Compatibility by Default**: Unknown configuration  keys should warn, not fail.
+- **Forward Compatibility by Default**: Unknown configuration keys should warn, not fail.
 - **Extensibility Is a First-Class Section**: Document how to extend the system in the spec itself.
 - **Test Matrix Is Non-Negotiable**: Every component gets a row; every row gets a verification command.
 - **Observability Is Part of Design**: If you can't name what to log, you can't name what went wrong.
@@ -298,4 +298,4 @@ For system specs, the archival hook should additionally verify that every row in
 - **Format:** Markdown (`.md`)
 - **Location:** `/documentation/specifications/active/` (during development), `/documentation/specifications/completed/` (after completion)
 - **Filename:** `system-specification-[service-name].md`
-- **Service Config File:** A service-specific configuration  file describing runtime policy (see §4). Distinct from the project-level `WORKFLOW.md`. In a single-service repository the two may collapse into one file; in multi-service repositories, keep them separate so every service owns its configuration  file and the project owns `WORKFLOW.md`.
+- **Service Configuration File:** A service-specific configuration file describing runtime policy (see §4). Distinct from the project-level `WORKFLOW.md`. In a single-service repository the two may collapse into one file; in multi-service repositories, keep them separate so every service owns its configuration file and the project owns `WORKFLOW.md`.
