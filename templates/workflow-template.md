@@ -76,7 +76,7 @@ The following hooks should be present in `.claude/settings.json` (or your agent 
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/pre-commit-gate.sh"
+            "command": "bash .claude/hooks/pre-commit-gate.bash"
           }
         ]
       }
@@ -86,7 +86,7 @@ The following hooks should be present in `.claude/settings.json` (or your agent 
         "hooks": [
           {
             "type": "command",
-            "command": "bash scripts/verify-archival.sh"
+            "command": "bash scripts/verify-archival.bash"
           }
         ]
       }
@@ -96,7 +96,7 @@ The following hooks should be present in `.claude/settings.json` (or your agent 
         "hooks": [
           {
             "type": "command",
-            "command": "bash scripts/session-bootstrap.sh"
+            "command": "bash scripts/session-bootstrap.bash"
           }
         ]
       }
@@ -105,32 +105,13 @@ The following hooks should be present in `.claude/settings.json` (or your agent 
 }
 ```
 
-Supporting scripts:
+Supporting scripts — **copy-ready starting points ship with this framework under [`templates/scripts/`](scripts/)**. Each file is an annotated, portable starting point with a wiring-up comment at the top. Invoke them via `bash <path>.bash`; do not `chmod +x`.
 
-- `.claude/hooks/pre-commit-gate.sh` — reads the tool input from stdin, inspects the Bash command, runs tests/lint/typecheck only when the command contains `git commit`, and denies the tool use on failure. Minimal reference implementation:
+- [`templates/scripts/pre-commit-gate.bash`](scripts/pre-commit-gate.bash) — `PreToolUse` hook body. Reads the tool input from stdin, inspects the Bash command, runs tests/lint/typecheck only when the command contains `git commit`, and denies the tool use on failure. Fail-closed on `jq` errors, missing stdin, or unexpected input shape. Copy to `.claude/hooks/pre-commit-gate.bash` in your project and adapt the `TEST_COMMANDS` block.
 
-    ```bash
-    #!/bin/bash
-    INPUT=$(cat)
-    COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
-    [[ "$COMMAND" != *"git commit"* ]] && exit 0
+- [`templates/scripts/verify-archival.bash`](scripts/verify-archival.bash) — `Stop` hook body. Refuses to let the session end cleanly if any `documentation/tasks/active/implementing-*.md` file has unchecked boxes. Reports every offending file in the denial reason. Copy to `scripts/verify-archival.bash` in your project.
 
-    if ! (npm test && npm run lint && npm run typecheck); then
-      jq -nc '{
-        hookSpecificOutput: {
-          hookEventName: "PreToolUse",
-          permissionDecision: "deny",
-          permissionDecisionReason: "Tests, lint, or typecheck failed — fix before committing."
-        }
-      }'
-      exit 0
-    fi
-    exit 0
-    ```
-
-- `scripts/verify-archival.sh` — at `Stop`, refuses to let the session end cleanly if any `documentation/tasks/active/implementing-*.md` file has unchecked boxes.
-
-- `scripts/session-bootstrap.sh` — at `SessionStart`, prints a one-line summary of the current branch, active PRD, and unresolved tasks (optional but useful).
+- [`templates/scripts/session-bootstrap.bash`](scripts/session-bootstrap.bash) — `SessionStart` hook body. Prints a one-line situational summary (current branch, active PRD, count of unchecked tasks). Strictly read-only. Copy to `scripts/session-bootstrap.bash` in your project.
 
 ---
 
