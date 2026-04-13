@@ -10,7 +10,7 @@ The framework explicitly tells an AI Assistant: "First, build the fence. Then, e
 Before writing a PRD, assume the following about the agent that will consume it:
 1. **The agent has tools.** It can read TSX files, run `npm test`, grep the component tree, open a dev server, and commit. Frontend PRDs should reference those tools by name where relevant (e.g., "agent will run `npm test -- ComponentName.test.tsx` before committing").
 2. **The agent can spawn subagents.** Delegate broad component-tree audits, prop-drilling investigations, accessibility sweeps, and design-system conformance checks to Explore subagents. Keep the main agent focused on the feature's critical path.
-3. **The agent honors in-repo policy.** A `WORKFLOW.md` or `CLAUDE.md` at the repo root encodes test commands, commit style, and branch rules. Reference it — don't repeat it.
+3. **The agent honors in-repository policy.** A `WORKFLOW.md` or `CLAUDE.md` at the repository root encodes test commands, commit style, and branch rules. Reference it — don't repeat it.
 4. **Hooks enforce deterministic rules.** "Tests must pass before commit," "No `any` types in new files," "Accessibility audit before merge" — these belong in `settings.json` hooks, not PRD prose.
 5. **Work happens in an isolated workspace** — a dedicated branch or git worktree per feature. Never assume `main`.
 6. **Requirements are machine-verifiable.** Prefer "component renders with `role=button` and responds to `Enter` / `Space`" over "component is accessible."
@@ -89,6 +89,14 @@ The frontend should handle:
    - YES → Always backend
    - NO → Consider other factors
 
+6. **"Does this require real-time or streaming updates?"**
+   - Server-pushed data, live feeds, WebSocket subscriptions → backend manages the stream; frontend consumes it
+   - Purely client-side polling of already-fetched data → Frontend timer/state
+
+7. **"Is an audit trail or regulatory record required?"**
+   - Anything that must be logged immutably (trades, auth events, user consent) → Backend persists the record
+   - Ephemeral UI state with no compliance requirement → Frontend only
+
 ### Common Anti-Patterns to Avoid
 
 ❌ **DON'T**: Write PRD that says "Frontend calculates P/C ratio from options data"
@@ -102,6 +110,27 @@ The frontend should handle:
 
 ❌ **DON'T**: "Frontend calculates moving averages from price history"
 ✅ **DO**: "Backend includes SMA-20/50/200 in market data response"
+
+❌ **DON'T**: "Frontend calls endpoint A, then endpoint B, then endpoint C to build the view"
+✅ **DO**: "Backend provides a single composite endpoint returning all data the view needs"
+
+❌ **DON'T**: "Frontend normalizes raw API response schema before rendering"
+✅ **DO**: "Backend returns a response shaped to the view's needs; frontend renders directly"
+
+### Spanning Requirements ([Backend/Frontend/Both])
+
+When a single feature requirement touches both layers, split it into two FRs — one per layer — so each has a clear owner:
+
+```
+# Instead of one vague requirement:
+FR1: The system must calculate and display P/C ratios
+
+# Write two explicit ones:
+FR1: Backend: Calculate expiration-specific P/C ratios and include them in the options chain response
+FR2: Frontend: Display the pre-calculated putCallRatio field from the backend response
+```
+
+Use `[Both]` only for shared infrastructure concerns (e.g., error envelope schema agreed by both sides). When in doubt, split into separate FRs.
 
 ### Options Trading Context Examples
 
@@ -158,7 +187,7 @@ FR3: Frontend: Display comparison data from single API response
 
 ### Before Asking Anything — Use Tools First (v4.0.0)
 The agent must **read before it asks**:
-- Read `CLAUDE.md` / `WORKFLOW.md` at the repo root for project conventions.
+- Read `CLAUDE.md` / `WORKFLOW.md` at the repository root for project conventions.
 - Grep for existing components/hooks/contexts that solve a similar problem.
 - Read the nearest sibling component to the target change for naming and style conventions.
 - Run the test command once to confirm the baseline is green.
@@ -183,8 +212,7 @@ Only then ask questions about things the codebase genuinely cannot answer.
 - ☐ Have we identified all system integrations and dependencies?
 - ☐ Have we explicitly assigned work to backend vs frontend with justification?
 - ☐ Have we verified no frontend data aggregation or heavy computation?
-- ☐ **NEW**: Have we explicitly assigned work to backend vs frontend with justification?
-- ☐ **NEW**: Have we verified no frontend data aggregation or heavy computation?
+- ☐ Have we verified no sequential multi-endpoint frontend data hydration?
 - ☐ Have we outlined clear acceptance criteria?
 - ☐ Have we defined success metrics with failure thresholds?
 - ☐ **v4.0.0**: Have we identified delegatable research for Explore subagents?
@@ -274,16 +302,20 @@ Consider these prompts:
 **Before finalizing PRD, audit each functional requirement:**
 
 ☐ Have we justified why work is on frontend vs backend?
-☐ Are we avoiding frontend data aggregation?
-☐ Are calculations happening on the backend?
-☐ Will the backend API support future clients (mobile, etc.)?
+☐ Are we avoiding frontend data aggregation and complex calculations?
+☐ Are we avoiding sequential multi-endpoint calls from the frontend?
+☐ Are calculations and data transformations happening on the backend?
+☐ Will the backend API shape support future clients (mobile, desktop, API consumers)?
 ☐ Are we following the "smart backend, simple frontend" principle?
+☐ Does each backend FR have a clear error response shape the frontend can handle?
+☐ Are we reusing existing API endpoints where possible (not creating new ones for convenience)?
 
 **Red Flags**:
-- PRD mentions "frontend calculates" or "frontend aggregates"
-- Multiple API calls from frontend to achieve one feature
-- Frontend doing data normalization or transformation
-- Complex business logic in React components
+- PRD mentions "frontend calculates", "frontend aggregates", or "frontend normalizes"
+- Frontend makes 2+ sequential API calls to hydrate a single view
+- Frontend doing data normalization or schema transformation before rendering
+- Complex business logic in React components or hooks
+- Audit/compliance-relevant operations assigned to frontend
 
 ### PRD Review Checkpoint: Agent Orchestration Audit (v4.0.0)
 **Before finalizing PRD, audit the execution plan:**
