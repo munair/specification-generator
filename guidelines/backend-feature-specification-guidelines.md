@@ -35,7 +35,20 @@ Before writing a PRD, assume the following about the agent that will consume it:
 
 ## Clarifying Questions Framework
 
-The agent should adapt its questions based on the prompt, prioritizing understanding over assumptions. Before asking anything, the agent should **first use its tools** — read `CLAUDE.md`/`WORKFLOW.md`, grep the target Lambda directory, and read adjacent handlers. Do not ask questions the codebase can answer.
+The agent should adapt its questions based on the prompt, prioritizing understanding over assumptions.
+
+### Before Asking Anything — Use Tools First (v4.0.0)
+
+The agent must **read before it asks**. Every question the codebase or the project configuration can already answer is a question the agent should answer itself, not hand back to the user. Before opening a clarifying-questions dialogue, the agent should:
+
+- Read `WORKFLOW.md` (or `CLAUDE.md`) at the repository root for test commands, branch policy, commit style, and hook configuration. These answer a surprising number of "what framework do you use" questions without the user typing a word.
+- Grep the target Lambda directory for existing handlers, shared utilities, and middleware. Naming conventions, error envelopes, and authorization patterns are usually right there in sibling files.
+- Read the nearest existing handler to the one being specified. It will show the house style for request parsing, error shaping, logging, and response construction.
+- Read the relevant DynamoDB table schema or infrastructure-as-code file for any table the new handler will touch. This answers access-pattern and projection questions directly.
+- Scan recent `git log` output for commit-message style, scope names, and the kinds of change the project normally ships.
+- Run the test command once to confirm the baseline is green. A red baseline is itself a finding worth surfacing before the specification work begins.
+
+Only after doing those reads should the agent ask questions — and only about things the codebase genuinely cannot answer (new behavior, scope decisions, user intent).
 
 ### Essential (Always Ask)
 - **Boundaries:** "What should this feature *not* do? Any explicit non-goals?"
@@ -94,6 +107,45 @@ The generated PRD should include the following sections:
 8. **Agent Execution Plan (v4.0.0):** Name the branch or worktree, identify which sections are delegatable (see "Agent Delegation Strategy"), and list any hooks that must be wired up (e.g., `PreToolUse` on `git commit` to run tests). Reference `WORKFLOW.md`/`CLAUDE.md` instead of repeating its contents.
 9. **Success Metrics:** How will the success of this feature be measured? Include both quantitative and qualitative indicators. Prefer metrics the agent can verify by running a test or reading a log.
 10. **Open Questions:** List any remaining questions or areas needing further clarification.
+
+## PRD Review Checkpoint: Final Audit
+
+**Before finalizing the PRD, run this consolidated checklist.** It is the backend counterpart to the Final Audit in `frontend-feature-specification-guidelines.md` §5 — one structured pass covering placement, execution plan, and red flags. This audit is a review step the agent performs *on* the finished PRD before presenting it; its contents do not need to appear in the PRD itself.
+
+### Architectural Placement
+
+- ☐ Is every functional requirement prefixed `Backend:` and written as a verifiable assertion (HTTP status, response shape, measurable latency)?
+- ☐ Are all write endpoints that should be idempotent explicitly specified as idempotent, with the idempotency key or natural key named?
+- ☐ Does the handler stay within its own service boundary (no cross-Lambda reads, no hidden coupling to another handler's internal state)?
+- ☐ Is the error envelope specified — either by reference to an existing shared shape or, if truly new, defined explicitly — with every error code the endpoint can emit?
+- ☐ Does the response shape support future clients (mobile, API consumers) without reshaping, and is it projected from the data source in a way that does not lock out those future clients?
+- ☐ If the feature touches multiple tables or multiple services in one write, is the transactional story stated explicitly (atomic, compensating, eventually consistent) rather than assumed?
+- ☐ Is the IAM scope the feature requires the minimum the work actually needs — no "while we're at it" expansions?
+- ☐ Are streaming, real-time push, or cross-component state-machine requirements routed to `system-specification-guidelines.md` §6 rather than specified inline in a backend PRD?
+- ☐ Are audit-relevant operations routed to `system-specification-guidelines.md` §7 rather than handled ad hoc in this handler's success path?
+
+### Agent Execution Plan
+
+- ☐ Is the branch or worktree name specified?
+- ☐ Is Delegatable Research broken out for Explore or Plan subagents, with each item bounded and expected to return a summary rather than raw file content?
+- ☐ Are the hooks that gate deterministic rules (pre-commit tests, lint, archival verification) named explicitly, and does the PRD assume they exist rather than restating the rules they enforce?
+- ☐ Does the PRD reference `WORKFLOW.md` (or `CLAUDE.md`) at the repository root rather than restating test commands, commit style, or branch policy inline?
+- ☐ Are the acceptance criteria machine-verifiable — every one of them runnable as a test assertion, `curl` invocation, or log-line match, with no prose judgments like "looks right" or "handles errors gracefully"?
+
+### Red Flags — Rewrite the PRD if Any Apply
+
+- "The handler should probably be idempotent" with no explicit specification of how idempotency is achieved.
+- A backend FR that is really a distributed-state or concurrency problem (cross-request coordination, multi-Lambda orchestration, streaming push) — these are system-level concerns and belong in a system specification, not a backend PRD.
+- Fail-open behavior on an audit-relevant write path where fail-closed is the correct choice. The audit section in `system-specification-guidelines.md` §7.7 is explicit that there is no third option; make the call.
+- Missing error envelope. A backend endpoint that emits errors without a documented shape is an endpoint that clients will parse differently across every integration.
+- Response shape driven by a specific current client's convenience rather than by the data source's natural projection. Response shape is a product decision that outlives any single caller; design it to be stable.
+- Secrets, tokens, or full request bodies surfacing in structured logs. PII and secrets never leave the request-handling boundary; logs carry redacted context, nothing more.
+- IAM overreach — a handler granted `dynamodb:*` when it needs `GetItem` on one table.
+- Prose rules the agent must "remember" — commit style, branch policy, test commands. These belong in hooks and in `WORKFLOW.md`, not in PRD narrative.
+- Restated `WORKFLOW.md` contents inline. If a section of the PRD could be deleted by copying one sentence from `WORKFLOW.md` into it, delete the section and reference the file instead.
+- Acceptance criteria that are not machine-verifiable. "The endpoint responds quickly" is not a criterion; "p95 latency under 50 ms in `test-lambda-latency` output" is.
+- A flat sequential task list in the PRD's Agent Execution Plan when the research work is genuinely parallelizable across independent Explore subagents.
+- Multi-table writes with no transactional story, no rollback path, and no reconciliation design on partial failure.
 
 ## Guiding Principles
 
