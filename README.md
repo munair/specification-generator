@@ -20,7 +20,7 @@ v4.0.0 adds a third concern the original framework didn't address: **agent-era e
 
 ## The Solution: Creative Abandon Within Scope
 
-This repository contains a battle-tested framework that solves both problems through a simple but powerful metaphor:
+This repository contains a framework that solves both problems through a simple but powerful metaphor:
 
 > **"First, build the fence. Then, explore every inch of the playground."**
 
@@ -64,19 +64,21 @@ Backend, Frontend, Exploratory, and Tasks guidelines each gained a new **Agent-E
 PRDs written under v4.0.0 are shorter and more actionable because they **reference** project conventions instead of restating them.
 ### 2. New guideline: System-Level Specifications
 A new guideline — `system-specification-guidelines.md` — fills a gap in the taxonomy. The existing Backend and Frontend guidelines are optimized for single-feature PRDs (a Lambda handler, a React component). They are not the right tool for specifying a multi-component service with a state machine, concurrency, and observability.
-The new guideline uses a section spine adapted from OpenAI's Symphony `SPEC.md`:
+The new guideline uses a section spine adapted from OpenAI's Symphony `SPEC.md`, extended with cross-cutting system concerns:
 1. Problem & Goals
 2. System Architecture (component table)
 3. Domain Model (with stable IDs)
-4. Workflow / Policy File
+4. Service Policy / Config File (distinct from project `WORKFLOW.md`)
 5. State Machine & Orchestration
-6. Safety & Integration
-7. Observability & Operations
-8. Testing Matrix (per component, with verification commands)
-9. Agent Execution Plan
-10. Extensibility
-11. Non-Goals
-12. Open Questions
+6. **Streaming Transports** — SSE/WebSocket/long-poll, backpressure, reconnect/resume, heartbeat
+7. **Audit & Compliance Records** — schema, retention, immutability, fail-closed vs. fail-open write path
+8. Safety & Integration
+9. Observability & Operations
+10. Testing Matrix (per component, with verification commands)
+11. Agent Execution Plan
+12. Extensibility
+13. Non-Goals
+14. Open Questions
 **Use it when**: you're specifying an orchestrator, daemon, long-running service, or any system with ≥ 3 communicating components. **Don't use it when**: you're specifying a single Lambda or a single React component — the Backend or Frontend guideline is the right fit there.
 ### 3. New convention: `WORKFLOW.md` as the in-repository policy contract
 v4.0.0 formalizes an in-repository policy file — `WORKFLOW.md` (or `CLAUDE.md`, `AGENTS.md`, `.cursorrules`, depending on your harness) — as the **single source of truth** for project-wide rules:
@@ -137,7 +139,7 @@ proposing the high-level plan."
 
 ## Guideline Taxonomy: Domain-First Organization
 
-The framework now provides **five specialized guidelines** plus the `WORKFLOW.md` convention:
+The framework now provides **six specialized guidelines** — four for PRD generation (Backend, Frontend, Exploratory, System), one for task generation (Implementation Tasks), and one for the repository-level policy contract (Workflow File):
 
 ### Backend Feature Specifications
 **File**: `guidelines/backend-feature-specification-guidelines.md`
@@ -298,126 +300,113 @@ authorization, and dependency-free testing..."
 
 ### `guidelines/backend-feature-specification-guidelines.md`
 
-The complete backend framework document containing:
-- **Lambda-Specific Patterns** - Serverless architecture best practices
-- **Dependency-Free Testing** - Node.js native module testing approach
-- **API Design** - REST endpoint patterns and error handling
-- **Data Validation** - Input sanitization and transformation
-- **DynamoDB Integration** - Authorization and data access patterns
-- **Performance Optimization** - Concurrency, caching, cold start mitigation
-- **Archival Cross-Reference** - Links to task completion workflow
+The backend PRD guideline, containing:
+- **Agent-Era Execution Model** (v4.0.0) — tool-using agent expectations
+- **Lambda / serverless patterns** — API design, dependency-free testing
+- **Architectural Boundaries Framework** — where work belongs
+- **Data validation, authorization, DynamoDB integration**
+- **Agent Delegation Strategy** (v4.0.0) — what to hoist to subagents
+- **Archival cross-reference**
 
 ### `guidelines/frontend-feature-specification-guidelines.md`
 
-The complete frontend framework document containing:
-- **Architectural Boundaries Framework (NEW)** - Frontend vs backend decision making
-- **5-Question Decision Framework** - Where should work happen?
-- **Common Anti-Patterns** - Concrete wrong vs correct examples
-- **Architectural Audit Checklist** - Self-verification before finalization
-- **Component Architecture** - React/TypeScript patterns
-- **State Management** - Context API and reducer patterns
-- **Progressive Disclosure** - Complexity management in UIs
-- **Accessibility Standards** - WCAG AA compliance requirements
-- **Testing Patterns** - Vitest and React Testing Library
-- **Performance Optimization** - Bundle size, lazy loading, memoization
-- **Archival Cross-Reference** - Links to task completion workflow
+The frontend PRD guideline, containing:
+- **Agent-Era Execution Model** (v4.0.0)
+- **Architectural Boundaries Framework** — frontend vs. backend decision making
+- **5-Question Decision Framework** — systematic work placement
+- **Spanning Requirements** (v4.0.0) — splitting cross-layer requirements
+- **Routing hints** (v4.0.0) — streaming and audit requirements are owned by the backend/system guidelines; the frontend guideline points to them
+- **Agent Orchestration Audit** (v4.0.0) — a pre-finalization checkpoint for red flags
+- **Component architecture, state management, progressive disclosure**
+- **Testing patterns (Vitest + React Testing Library)**
+- **Archival cross-reference**
 
 ### `guidelines/exploratory-feature-specification-guidelines.md`
 
-The creative exploration framework containing:
-- **The Spark** - Problem identification without constraints
-- **Dream Scenario** - Visualizing ideal outcomes
-- **Failure Mode Analysis** - Identifying risks through speculation
-- **Metaphor Development** - Finding conceptual frameworks
-- **Notes Capture** - Preserving insights for formal specifications
-- **Migration Path** - Moving from freeform to systematic PRD
-- **Archival Cross-Reference** - Links to task completion workflow
+The creative exploration guideline, containing:
+- **The Spark** — problem identification without constraints
+- **Recon subagent integration** (v4.0.0) — broader exploration, less context pollution
+- **Dream Scenario, failure mode analysis, metaphor development**
+- **Migration path** to a domain-specific formal spec
+- **Archival cross-reference**
 
-### `implementation-tasks-creation-guidelines.md`
+### `guidelines/system-specification-guidelines.md` *(new in v4.0.0)*
 
-The task generation and archival framework containing:
-- **ARCHIVAL PROTOCOL** - Step-by-step completion workflow (lines 13-61)
-- **Task Granularity** - Breaking PRDs into atomic tasks
-- **Testing Requirements** - Backend vs Frontend testing approaches
-- **Phase Planning** - Interactive high-level task approval
-- **Completion Workflow** - Marking tasks, renaming files, archiving
+The multi-component system guideline, containing:
+- **Section spine** adapted from OpenAI's Symphony `SPEC.md`
+- **System Architecture** — component table (responsibility, inputs, outputs, lifecycle)
+- **Domain Model** with stable entity IDs
+- **State machine and orchestration, safety rules, integration contracts**
+- **Observability & Operations** — structured logging, metrics, alerts
+- **Streaming and audit guidance** — cross-cutting concerns live here, not in Frontend
+- **Testing matrix** per component, with verification commands
+- **Agent Execution Plan** — branch, hooks, delegatable research, subagent-per-component
+- **Extensibility, non-goals, open questions**
 
-### Real-World Validation
+### `guidelines/workflow-file-guidelines.md` *(new in v4.0.0)*
 
-See the `examples/` directory for **battle-tested PRDs** that led to successful implementations:
+The in-repository policy file guideline, containing:
+- **Purpose** — single source of truth for project-wide rules
+- **What belongs in `WORKFLOW.md`** — test commands, branch policy, commit format, hooks, subagent defaults, archival protocol
+- **What does not belong** — feature-specific requirements, architecture decisions that vary by PRD, secrets
+- **Forward compatibility rule** — unknown keys are ignored so the convention can evolve
+- **Integration notes** for each of the five other guidelines
+- **Template**: `templates/workflow-template.md`
 
-1. **[Budget Filtering](examples/feature-specification-for-budget-filtering.md)** - Complex business logic feature with 5 explicit constraints, delivered in record time
-2. **[Persistent Display CSS Grid Solution](examples/feature-specification-persistent-display-css-grid-solution.md)** - UI/UX optimization using creative exploration approach
+### `guidelines/implementation-tasks-creation-guidelines.md`
 
-These examples demonstrate the framework's evolution from theoretical guidelines to **proven methodology** with measurable results.
+The task generation and archival guideline, containing:
+- **Agent-Era Execution Model** (v4.0.0) — agent executes tasks directly
+- **ARCHIVAL PROTOCOL** — hook-enforceable completion workflow
+- **Task Granularity** — atomic, verifiable tasks
+- **Domain-specific testing approaches** — backend (Node.js native) vs. frontend (Vitest + RTL)
+- **New v4.0.0 task format** — branch, `WORKFLOW.md` reference, recon phase, `[parallel]` markers, per-task verification
 
-## Getting Started
+### Example Specifications
 
-### For Backend Features (Lambda Functions, APIs):
-1. **Copy the backend guidelines** (`guidelines/backend-feature-specification-guidelines.md`) to your AI assistant context
-2. **Use the activation prompt**: "Please follow the Backend Feature Specification guidelines. Feature request: [YOUR REQUEST]"
-3. **Let the AI establish boundaries first** before exploring solutions
-4. **Watch it create backend-optimized specs** with proper Lambda patterns
+See the `examples/` directory for two reference PRDs used to develop and validate the framework:
 
-### For Frontend Features (React/TypeScript):
-1. **Copy the frontend guidelines** (`guidelines/frontend-feature-specification-guidelines.md`) to your AI assistant context
-2. **Use the activation prompt**: "Please follow the Frontend Feature Specification guidelines. Feature request: [YOUR REQUEST]"
-3. **Let the AI establish boundaries first** before exploring solutions
-4. **Watch it create component-focused specs** with proper state management patterns
+1. **[Budget Filtering](examples/feature-specification-for-budget-filtering.md)** — business-logic feature with explicit constraints
+2. **[Persistent Display CSS Grid Solution](examples/feature-specification-persistent-display-css-grid-solution.md)** — UI/UX optimization using the exploratory approach
 
-### For Creative Exploration:
-1. **Copy the exploratory guidelines** (`guidelines/exploratory-feature-specification-guidelines.md`) to your AI assistant context
-2. **Use when**: Systematic approaches aren't working OR you need innovative solutions
-3. **Process**: Freeform exploration → migrate essentials to domain-specific formal spec
-4. **Result**: Creative insights captured, then structured for implementation
+These are illustrative, not exhaustive — use them as structural references when drafting your own PRDs.
 
-### Using Manual Templates:
-1. **Choose your template**:
-   - Simple: For bug fixes, minor enhancements, single features
-   - Full: For major features, integrations, strategic initiatives
-2. **Fill out sections in order** - Don't skip the boundaries!
-3. **Use the quality checklist** before finalizing
-4. **Keep for reference** during implementation
+## What the Framework Aims to Produce
 
-## Results You Can Expect
-
-Teams using this framework report:
-- **Architectural Consistency (NEW)** - Clear frontend/backend separation
-- **Prevention of Common AI Mistakes** - No more frontend calculations
-- **Faster specification cycles** - Less back-and-forth clarification
-- **More focused features** - Reduced scope creep and feature bloat
-- **Better AI collaboration** - Clearer expectations and outputs
-- **Improved developer handoffs** - Specifications that junior developers can actually implement
-- **Proper Completion Workflow** - Archival protocol prevents incomplete implementations
+Teams using this framework aim for:
+- **Architectural consistency** — clear frontend/backend separation
+- **Fewer common AI mistakes** — business logic on the backend by default
+- **Shorter specification cycles** — less back-and-forth clarification
+- **Focused features** — less scope creep and feature bloat
+- **Machine-verifiable acceptance criteria** — tests, not prose judgments
+- **Cleaner implementation handoffs** — specifications a junior developer or a subagent can execute
+- **Reliable completion** — archival protocol and hook enforcement prevent half-done features
 
 ## Why Open Source This?
 
 Product managers, developers, and AI practitioners everywhere struggle with the same challenge: how to harness AI's creative power without losing control of scope and requirements.
 
-This framework represents dozens of iterations and real-world testing, building on inspiration from innovative work in the open-source community - particularly [Aaron Nichols](https://github.com/adnichols) and [Ryan Carson](https://github.com/snarktank), whose projects demonstrated the power of structured AI collaboration.
+This framework builds on open-source work by [Aaron Nichols](https://github.com/adnichols) and [Ryan Carson](https://github.com/snarktank), whose projects explored structured AI collaboration patterns.
 
 By open-sourcing this approach, I hope to:
 
 - **Standardize AI specification practices** across teams and organizations
-- **Enable better human-AI collaboration** in product development
-- **Demonstrate the power of domain-specific patterns** in AI instruction
-- **Prevent systematic archival errors** through integrated completion workflows
+- **Improve human–AI collaboration** in product development
+- **Demonstrate the value of domain-specific patterns** in AI instruction
+- **Reduce systematic archival errors** through integrated completion workflows
 
 ## Contributing
 
-This framework is the result of practical experimentation with AI-assisted product development. If you have improvements, variations, or real-world results to share, contributions are welcome.
+If you have improvements, variations, or results to share, contributions are welcome.
 
 The goal is simple: make AI assistants better partners in building great software.
 
 ---
 
 **Framework Versions:**
-- **v4.0.0**: Agent-Era Update — tool-using agents, subagents, hooks, `WORKFLOW.md` convention, system-level guideline
-- **v3.0.0**: Architectural Decision Framework — frontend/backend separation
-- Backend Guidelines: Optimized for serverless Lambda architecture
-- Frontend Guidelines: Optimized for React/TypeScript with architectural boundaries
-- Exploratory Guidelines: Constraint-free creative ideation
-- System Guidelines (v4.0.0): Multi-component services with state machines and observability
+- **v4.0.0** — Agent-Era Update: tool-using agents, subagents, hooks, `WORKFLOW.md` convention, System guideline
+- **v3.0.0** — Architectural Decision Framework: frontend/backend separation, 5-Question framework, Architectural Audit
+- **v2.0.0** — Framework completion: Tasks guideline, ARCHIVAL PROTOCOL, consistent naming
+- **v1.x**   — Initial framework, templates, and first examples
 
-*"First, build the fence. Then, explore every inch of the playground."*
-*"Read the workflow. Let the hooks enforce it. Delegate the recon. Keep the context clean."* (v4.0.0)
+*"First, build the fence. Then, explore every inch of the playground. Read the workflow. Let the hooks enforce it."*

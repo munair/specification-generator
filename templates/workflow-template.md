@@ -12,60 +12,123 @@ This file encodes **project-level rules** that coding agents (Claude Code, Codex
 > **Contract**: If a guideline (PRD, task list, system spec) says "follow project conventions," the agent reads this file rather than asking the human. If a rule is deterministic, it belongs here — or in a hook — not in a PRD narrative.
 ---
 ## 1. Test Commands
-The agent must run these before any commit. If a `PreToolUse(Bash:git commit)` hook is configured in `settings.json`, it runs these automatically.
+
+The agent must run these before any commit. When the reference hook in §4 is configured, a `PreToolUse` event on `git commit` runs them automatically.
+
+> **Delete what does not apply to your project.** This section is an example, not a mandate. A pure backend repo has no `npm test`; a Python project has no `typecheck` in the Node sense. Keep the commands you actually run.
+
 ```bash
 # Backend (Node.js native tests)
 node --test tests/
+
 # Frontend (Vitest)
 npm test
+
 # Linting
 npm run lint
-# Type-checking
+
+# Type-checking (TypeScript projects only)
 npm run typecheck
 ```
-**Rule**: All four must exit 0 before a commit is allowed.
+
+**Rule**: Every command you keep must exit 0 before a commit is allowed.
+
 ---
+
 ## 2. Branch Policy
 - **Never commit directly to `main`.**
 - Feature work happens on `feature/[feature-name]`.
 - System-level work happens on `system/[service-name]`.
 - Experimental/exploration work happens in a git worktree under `.worktrees/`.
 - Agents may create branches; agents may not delete branches without explicit user approval.
+
 ---
+
 ## 3. Commit Style
 - Conventional Commits: `type(scope): description`
 - Types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `perf`, `style`
 - Subject line ≤ 72 characters
 - Body explains the **why**, not the **what**
 - No emoji unless the user requests it
+
 **Example**: `feat(lambdas): add account numbers endpoint with DynamoDB-backed authorization`
+
 ---
+
 ## 4. Hook Configuration (Reference)
+
 The following hooks should be present in `.claude/settings.json` (or your agent harness equivalent). If they are missing, the agent's first task for any new feature should be to wire them up.
+
+> **Schema note.** The Claude Code `PreToolUse` hook shape is:
+> ```
+> { "matcher": "<tool-name-regex>", "hooks": [ { "type": "command", "command": "<shell>" } ] }
+> ```
+> `matcher` is a **regex against the tool name only**. There is no top-level `pattern` key for filtering by command content — filtering by command content is the hook script's job. Always validate against your harness's schema; other harnesses (Codex, Cursor, etc.) may differ.
+
 ```jsonc
 {
   "hooks": {
     "PreToolUse": [
       {
         "matcher": "Bash",
-        "pattern": "git commit",
-        "command": "npm test && npm run lint && npm run typecheck"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/pre-commit-gate.sh"
+          }
+        ]
       }
     ],
     "Stop": [
       {
-        "command": "scripts/verify-archival.sh"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/verify-archival.sh"
+          }
+        ]
       }
     ],
     "SessionStart": [
       {
-        "command": "scripts/session-bootstrap.sh"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/session-bootstrap.sh"
+          }
+        ]
       }
     ]
   }
 }
 ```
-Where `scripts/verify-archival.sh` is a small script that checks: *no active implementing-\*.md file has unchecked boxes at session end.*
+
+Supporting scripts:
+
+- `.claude/hooks/pre-commit-gate.sh` — reads the tool input from stdin, inspects the Bash command, runs tests/lint/typecheck only when the command contains `git commit`, and denies the tool use on failure. Minimal reference implementation:
+
+    ```bash
+    #!/bin/bash
+    INPUT=$(cat)
+    COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
+    [[ "$COMMAND" != *"git commit"* ]] && exit 0
+
+    if ! (npm test && npm run lint && npm run typecheck); then
+      jq -nc '{
+        hookSpecificOutput: {
+          hookEventName: "PreToolUse",
+          permissionDecision: "deny",
+          permissionDecisionReason: "Tests, lint, or typecheck failed — fix before committing."
+        }
+      }'
+      exit 0
+    fi
+    exit 0
+    ```
+
+- `scripts/verify-archival.sh` — at `Stop`, refuses to let the session end cleanly if any `documentation/tasks/active/implementing-*.md` file has unchecked boxes.
+
+- `scripts/session-bootstrap.sh` — at `SessionStart`, prints a one-line summary of the current branch, active PRD, and unresolved tasks (optional but useful).
 ---
 ## 5. Subagent Delegation Defaults
 By default, delegate to subagents:

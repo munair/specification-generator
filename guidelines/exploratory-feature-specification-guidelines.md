@@ -5,11 +5,26 @@ It is intentionally loose. Use it to let the agent (or the human writer) **wande
 ---
 ## 0. Agent-Era Exploration Model (v4.0.0)
 Exploration is no longer a pure thought exercise. A tool-using agent can **actually look around** before imagining solutions. Before answering any prompt below, the agent should:
-1. **Delegate a reconnaissance subagent.** Spawn an Explore subagent with a bounded question like *"What does the current options chain ingestion flow look like, and where are the seams where a new indicator could be inserted?"* Let it range across the repository while the main agent preserves context for creative work.
+1. **Delegate an Explore subagent.** Spawn an Explore subagent with a bounded question like *"What does the current options chain ingestion flow look like, and where are the seams where a new indicator could be inserted?"* Let it range across the repository while the main agent preserves context for creative work.
 2. **Run cheap experiments.** If an idea is testable in under 30 seconds (hit an API, parse a file, run a one-liner), run it. Exploration used to be speculation; now it can be small, real measurements.
 3. **Read adjacent prior art.** Grep the `examples/` and `documentation/specifications/completed/` directories for features that flirted with similar territory. Learn from what was tried.
-4. **Keep the creative context clean.** Do not let recon findings crowd out imagination. Summarize subagent findings into 3–5 bullet points before resuming the creative sections below.
+4. **Summarize findings into §0.5 before opening §1.** Keep the creative context clean: 3–5 bullet points in the Recon Findings section below, nothing more.
+
 Exploration is **broader** and **cheaper** than it was in v3.x — use subagents to expand breadth without losing focus.
+
+---
+
+## 0.5 Recon Findings (v4.0.0)
+
+Paste the summarized output of Explore subagents here **before starting §1 The Spark**. Findings belong upstream of the creative sections so the agent knows what's already in the codebase, where the seams are, and which "bold" ideas are actually half-built. If a subagent reveals:
+
+- **An adjacent feature already exists** — note the file path and the overlap, so §1 can pivot to augmentation instead of rebuild.
+- **A hidden constraint** (existing data shape, auth model, perf budget) — note it as a fence rail for the playground.
+- **A dead end** (tried before, abandoned, and why) — note it so §3 Failure Modes doesn't re-discover the same trap.
+
+Keep it to bullets. If the findings run longer than five bullets, spawn another Explore subagent to filter rather than letting the recon crowd out imagination.
+
+> **Intentionally before §1.** Section §0 instructs the agent to run recon first; the findings must therefore live before the creative sections, not after them. (In v4.0.0 earlier drafts this section was numbered §6.5 and placed at the end — that ordering contradicted §0 and has been corrected.)
 
 ---
 
@@ -57,11 +72,6 @@ Exploration is **broader** and **cheaper** than it was in v3.x — use subagents
 
 - Any stray thoughts, side ideas, or "what-ifs" to capture now.  
 - Even if they don't fit, record them here for later pruning.  
-
----
-
-## 6.5 Recon Findings (v4.0.0)
-Paste the summarized output of any Explore subagents here. Keep it short (bullets, not essays). These findings should inform — but not constrain — the creative sections above. If a subagent reveals that a wild idea is already half-built in the codebase, note it here and celebrate; if it reveals a hidden constraint, note that too.
 
 ---
 

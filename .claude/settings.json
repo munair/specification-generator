@@ -4,13 +4,29 @@
       "Read(./.env)",
       "Read(./.env.*)",
       "Read(./**/.env)",
-      "Read(./**/.env.*)"
+      "Read(./**/.env.*)",
+      "Edit(./.env)",
+      "Edit(./.env.*)",
+      "Edit(./**/.env)",
+      "Edit(./**/.env.*)",
+      "Write(./.env)",
+      "Write(./.env.*)",
+      "Write(./**/.env)",
+      "Write(./**/.env.*)",
+      "Grep(./.env)",
+      "Grep(./.env.*)",
+      "Grep(./**/.env)",
+      "Grep(./**/.env.*)",
+      "Glob(./.env)",
+      "Glob(./.env.*)",
+      "Glob(./**/.env)",
+      "Glob(./**/.env.*)"
     ]
   },
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Read|Write|Edit|Bash|Grep|Glob",
+        "matcher": "Read|Write|Edit|Bash|Grep|Glob|Task|WebFetch|WebSearch|NotebookEdit",
         "hooks": [
           {
             "type": "command",

@@ -227,15 +227,6 @@ This document provides a granular, atomic checklist for implementing the feature
 - [ ] 3.1 Confirm `grep -c "- \[ \]" documentation/tasks/active/implementing-[feature-name].md` returns 1 (this line).
 - [ ] 3.2 Rename `implementing-` → `implementation-log-` and move to `documentation/tasks/completed/`.
 - [ ] 3.3 Commit archival (Stop hook will block if any checkbox above is unchecked).
----
-- `index.cjs`
-- `utilities/new-utility.cjs`
-- `tests/utilities/new-utility.test.cjs`
-- `tests/integration/feature-name.test.cjs`
-### Delegated Work
-- Phase 0 tasks run as Explore subagents in parallel before Phase 1 begins.
-- Phase 1 and Phase 2 are independent and can run as parallel subagents.
-```
 
 ---
 
@@ -244,6 +235,12 @@ This document provides a granular, atomic checklist for implementing the feature
 - `index.cjs`
 - `utilities/new-utility.cjs`
 - `tests/utilities/new-utility.test.cjs`
+- `tests/integration/feature-name.test.cjs`
+
+### Delegated Work
+
+- Phase 0 tasks run as Explore subagents in parallel before Phase 1 begins.
+- Phase 1 and Phase 2 are independent and can run as parallel subagents.
 ```
 
 ### Phase 3: Feature Completion and Release

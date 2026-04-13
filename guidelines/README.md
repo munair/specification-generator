@@ -175,18 +175,24 @@ This guideline transforms approved PRDs into actionable implementation task list
 
 ## Decision Matrix: Which Guideline to Use?
 
-| Your Need                              | Use This Guideline | Then                                    |
-|----------------------------------------|--------------------|-----------------------------------------|
-| Lambda function feature                | Backend            | Generate PRD → implement                |
-| React component feature                | Frontend           | Generate PRD → implement                |
-| API endpoint creation                  | Backend            | Generate PRD → implement                |
-| Dashboard UI improvement               | Frontend           | Generate PRD → implement                |
-| Creative brainstorming                 | Exploratory        | Explore → migrate to Backend/Frontend   |
-| Systematic approach isn't working      | Exploratory        | Creative rescue → formalize             |
-| Novel feature, unclear domain          | Exploratory        | Define → choose Backend/Frontend        |
-| Bug fix (backend)                      | Backend            | Use Quick Start variant                 |
-| Bug fix (frontend)                     | Frontend           | Use Quick Start variant                 |
-| Complex system integration             | Backend or Frontend| Choose based on primary implementation  |
+| Your Need                                  | Use This Guideline     | Then                                                 |
+|--------------------------------------------|------------------------|------------------------------------------------------|
+| Lambda function feature                    | Backend                | Generate PRD → implement                             |
+| React component feature                    | Frontend               | Generate PRD → implement                             |
+| API endpoint creation                      | Backend                | Generate PRD → implement                             |
+| Dashboard UI improvement                   | Frontend               | Generate PRD → implement                             |
+| Creative brainstorming                     | Exploratory            | Explore → migrate to Backend/Frontend/System         |
+| Systematic approach isn't working          | Exploratory            | Creative rescue → formalize                          |
+| Novel feature, unclear domain              | Exploratory            | Define → choose Backend/Frontend/System              |
+| Bug fix (backend)                          | Backend                | Use Quick Start variant                              |
+| Bug fix (frontend)                         | Frontend               | Use Quick Start variant                              |
+| **Multi-component service / daemon**       | **System (v4.0.0)**    | **State machine, concurrency, observability first** |
+| **Agent orchestrator / poller**            | **System (v4.0.0)**    | **Workflow file, subagent-per-component, matrix**    |
+| **Cross-Lambda coordination layer**        | **System (v4.0.0)**    | **≥ 3 components; isolation over coordination**      |
+| **Streaming / real-time service**          | **System (v4.0.0)**    | **Owns SSE/WS, backpressure, audit**                 |
+| **Audit-sensitive or compliance feature**  | **System (v4.0.0)**    | **Owns log schema, retention, redaction**            |
+| **New repository setup** (one-time)        | **Workflow File (v4.0.0)** | **Author `WORKFLOW.md` and wire reference hooks** |
+| Complex system integration                 | Backend, Frontend, or System | Choose by scope: one component → B/F; multi → S |
 
 ## Complete Specification Lifecycle
 
@@ -293,14 +299,13 @@ This approach prevents scope creep while enabling creative, complete solutions.
 
 ## Guidelines Maintenance
 
-All four guidelines now include:
-- ✅ Archival cross-reference section (PRD guidelines reference task guideline)
-- ✅ Domain-first naming convention
-- ✅ Quick Start vs Full Process variants (Backend/Frontend)
-- ✅ Testing approach specific to domain
-- ✅ Integration with task generation workflow
-- ✅ Feature tagging strategy for implementation tracking
-- ✅ Complete ARCHIVAL PROTOCOL in task generation guideline
+All six guidelines now include:
+- Agent-Era Execution Model section (v4.0.0)
+- Domain-first naming convention
+- Quick Start vs Full Process variants where applicable (Backend, Frontend, System)
+- Testing approach specific to domain
+- Integration with task generation workflow
+- Cross-references to the ARCHIVAL PROTOCOL in the Tasks guideline
 
 **Framework Structure**:
 - **4 PRD Generation Guidelines**: Backend, Frontend, Exploratory, System (v4.0.0)
@@ -308,52 +313,42 @@ All four guidelines now include:
 - **1 Convention Guideline**: `workflow-file-guidelines.md` — in-repository policy contract (v4.0.0)
 - **Cross-References**: All PRD guidelines reference the ARCHIVAL PROTOCOL
 
-**Last Updated**: Friday, April 10, 2026
-**Framework Version**: v4.0.0 - Agent-Era Update
+**Last Updated**: Monday, April 13, 2026
+**Framework Version**: v4.0.0 — Agent-Era Update
 
 ---
 
-**Quick Reference Commands**:
+### Quick Reference Commands (v4.0.0)
 
 ```bash
-# Backend PRD activation
-"Follow backend-feature-specification-guidelines.md for Lambda function: [REQUEST]"
-
-# Frontend PRD activation
-"Follow frontend-feature-specification-guidelines.md for React component: [REQUEST]"
-
-# Exploratory PRD activation
-"Follow exploratory-feature-specification-guidelines.md to explore: [REQUEST]"
-
-# Task generation from approved PRD
-"Follow implementation-tasks-creation-guidelines.md to create implementation tasks for: [PRD FILE]"
-
-# Archival verification (before completing implementation)
-grep -c "- \[ \]" documentation/tasks/active/implementing-[feature-name].md
-**Quick Reference Commands (v4.0.0)**:
-```bash
-# Backend PRD activation (v4.0.0 — references WORKFLOW.md, uses subagents)
+# Backend PRD activation — references WORKFLOW.md, uses subagents
 "Follow guidelines/backend-feature-specification-guidelines.md for a Lambda function.
 Read WORKFLOW.md at the repository root first. Use Explore subagents for codebase-wide research.
 Feature request: [REQUEST]"
-# Frontend PRD activation (v4.0.0)
+
+# Frontend PRD activation
 "Follow guidelines/frontend-feature-specification-guidelines.md for a React component.
 Read WORKFLOW.md at the repository root first. Use Explore subagents for component-tree audits.
 Feature request: [REQUEST]"
+
 # System-level spec activation (NEW in v4.0.0)
 "Follow guidelines/system-specification-guidelines.md for a multi-component service.
 Read WORKFLOW.md at the repository root first. Use a Plan subagent to review the draft
 architecture before finalizing. System description: [DESCRIPTION]"
-# Exploratory PRD activation (v4.0.0 — with recon subagents)
+
+# Exploratory PRD activation — with recon subagents
 "Follow guidelines/exploratory-feature-specification-guidelines.md. Spawn an Explore
 subagent first to survey the codebase for adjacent prior art. Topic: [REQUEST]"
-# Task generation from approved PRD (v4.0.0)
+
+# Task generation from approved PRD
 "Follow guidelines/implementation-tasks-creation-guidelines.md for PRD at [PRD FILE].
 Spawn recon subagents for the PRD's Delegatable Research before proposing the plan."
+
 # Repository setup (NEW in v4.0.0 — one-time per project)
 "Follow guidelines/workflow-file-guidelines.md. Copy templates/workflow-template.md
 to the repository root as WORKFLOW.md and customize for this project. Then wire up the
 reference hooks in .claude/settings.json."
+
 # Archival verification (hook-enforced in v4.0.0)
 grep -c "- \[ \]" documentation/tasks/active/implementing-[feature-name].md
 # ^ Must return 0 before archiving. The Stop hook enforces this automatically

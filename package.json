@@ -2,12 +2,21 @@
   "name": "specification-generator",
   "version": "4.0.0",
   "description": "A framework for guiding tool-using coding agents to create comprehensive feature specifications through structured creativity",
-  "main": "README.md",
+  "private": true,
+  "files": [
+    "guidelines",
+    "templates",
+    "examples",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
   "directories": {
+    "doc": "guidelines",
     "example": "examples"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"specification-generator is a docs-only package; no tests to run.\" && exit 0"
   },
   "keywords": [
     "ai",

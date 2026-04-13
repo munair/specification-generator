@@ -5,9 +5,9 @@ All notable changes to the Specification Generator framework will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.0.0] - Friday, April 10, 2026
+## [4.0.0] - Monday, April 13, 2026
 ### The Agent-Era Update
-**BREAKING CHANGES**: All existing guidelines have been updated to assume a **tool-using coding agent** — not a chat-loop assistant. Two new guidelines and one new repository convention were added. This is a philosophical shift, not a format break: v3.0.0 PRDs remain valid, but new PRDs written under v4.0.0 are shorter, more actionable, and rely on the new `WORKFLOW.md` contract instead of restating project rules inline.
+All existing guidelines have been updated to assume a **tool-using coding agent** — not a chat-loop assistant. Two new guidelines and one new repository convention were added. Existing v3.x PRDs remain readable and valid; this release is tagged **4.0.0** because new v4.0.0-conformant PRDs expect a `WORKFLOW.md` policy file at the repository root, every PRD structure now includes an Agent Execution Plan section, the guideline taxonomy grew from four to six, and the recommended activation prompts changed. See [Why v4.0.0 is a Major Version](#why-v400-is-a-major-version) for the full list of expectations that shifted.
 ### Why This Major Version
 Over the 12 months since v3.0.0, coding agents gained capabilities the framework did not model:
 - **Tool use**: agents read files, run tests, grep the codebase, commit their own work
@@ -20,19 +20,21 @@ v3.x guidelines treated the "AI assistant" as a single chat loop. v4.0.0 treats 
 ### Added
 #### New Guideline: `system-specification-guidelines.md`
 A fifth guideline for specifying **multi-component systems**: orchestrators, daemons, long-running services, and anything with a non-trivial state machine. Fills a gap between feature-level PRDs (Backend, Frontend) and system-level specifications.
-**Section spine** (adapted from OpenAI's Symphony `SPEC.md`):
+**Section spine** (adapted from OpenAI's Symphony `SPEC.md`, extended with cross-cutting concerns that used to be homeless):
 1. Problem & Goals
 2. System Architecture (component table with responsibility, inputs, outputs, lifecycle)
 3. Domain Model (with stable IDs)
-4. Workflow / Policy File
+4. Service Policy / Config File (the service's own in-repository configuration  — distinct from the project `WORKFLOW.md`)
 5. State Machine & Orchestration
-6. Safety & Integration
-7. Observability & Operations
-8. Testing Matrix (per component, with verification commands)
-9. Agent Execution Plan
-10. Extensibility (first-class requirement)
-11. Non-Goals
-12. Open Questions
+6. Streaming Transports (SSE/WS/long-poll, backpressure, reconnect, resume)
+7. Audit & Compliance Records (schema, retention, immutability, fail-closed vs. fail-open)
+8. Safety & Integration
+9. Observability & Operations
+10. Testing Matrix (per component, with verification commands)
+11. Agent Execution Plan
+12. Extensibility (first-class requirement)
+13. Non-Goals
+14. Open Questions
 **Use when**: specifying a service with ≥ 3 communicating components. **Do not use when**: specifying a single Lambda or single React component — the existing Backend or Frontend guideline is the right fit there.
 #### New Guideline: `workflow-file-guidelines.md`
 Defines the `WORKFLOW.md` in-repository policy file convention. `WORKFLOW.md` (or `CLAUDE.md`, `AGENTS.md`, `.cursorrules` depending on harness) is the **single source of truth** for project-wide rules:
@@ -104,7 +106,7 @@ The task format example now includes:
 - The 5-Question Decision Framework
 - The ARCHIVAL PROTOCOL (now additionally hook-enforceable)
 - The Quick Start vs. Full PRD distinction
-- The `/documentation/specifications/active/` and `/completed/` directory structure
+- The `/documentation/specifications/active/ | completed/` and `/documentation/tasks/active/ | completed/` directory conventions. v4.0.0 also ships `.gitkeep` scaffolding so these directories exist on a fresh clone — previously the convention was documented but the directories had to be created by hand.
 ### Migration Guide: v3.x → v4.0.0
 **PRD format is not broken.** Existing v3.x PRDs remain valid. To fully adopt v4.0.0:
 1. **Copy `templates/workflow-template.md`** to your project root as `WORKFLOW.md`. Fill in test commands, branch policy, and project-specific rules.
@@ -112,6 +114,53 @@ The task format example now includes:
 3. **Audit existing PRDs**: wherever they restate a rule that now lives in `WORKFLOW.md`, delete the duplication and add a reference.
 4. **Update activation prompts** to mention `WORKFLOW.md` and subagent delegation. See `README.md` for the new prompt templates.
 5. **For your next multi-component project**, use `system-specification-guidelines.md` instead of cramming it into a Backend PRD.
+
+#### Worked Example: Before and After
+
+A concrete v3.x → v4.0.0 rewrite of a representative PRD snippet.
+
+**v3.x PRD (excerpt)** — rules restated inline:
+
+```markdown
+## Testing
+
+The following must pass before any commit:
+- `node --test tests/` for backend tests
+- `npm run lint` for linting
+- `npm run typecheck` for TypeScript
+
+## Branch Policy
+
+Work on a feature branch named `feature/[slug]`. Do not commit to `main`.
+Rebase on `main` before opening a PR.
+
+## Commit Format
+
+Use Conventional Commits: `feat(scope): message`. Reference the PRD in the body.
+
+## Functional Requirements
+- FR1: Backend: Add a new endpoint `/accounts/{id}/summary` that returns...
+- FR2: Backend: The endpoint must be authenticated via the existing middleware...
+```
+
+**v4.0.0 PRD (excerpt)** — rules hoisted into `WORKFLOW.md`, referenced:
+
+```markdown
+## Agent Execution Plan
+
+- **Branch**: `feature/account-summary-endpoint` (see `WORKFLOW.md` branch policy)
+- **Tests, lint, typecheck, commit format**: inherited from `WORKFLOW.md`
+- **Required hooks**: `PreToolUse(Bash:git commit)` runs tests (enforced by `.claude/settings.json`)
+- **Delegatable research**:
+  - `[Explore subagent]` Map existing `/accounts/*` handlers and their auth middleware usage.
+  - `[Explore subagent]` Identify DynamoDB access patterns already used for the `accounts` table.
+
+## Functional Requirements
+- FR1: Backend: Add a new endpoint `/accounts/{id}/summary` that returns...
+- FR2: Backend: The endpoint must be authenticated via the existing middleware...
+```
+
+The testing, branch-policy, and commit-format sections are gone — they live in `WORKFLOW.md` and are enforced by hooks. Only the **work that is specific to this feature** remains in the PRD.
 ### What This Solves
 **Before v4.0.0**:
 - Every PRD repeated the same rules about test commands, commit style, and branch policy
@@ -129,13 +178,15 @@ The task format example now includes:
 - Acceptance criteria are machine-verifiable test assertions, not prose judgments
 ### Inspiration
 The new System guideline's section spine was adapted from OpenAI's Symphony `SPEC.md` — a reference specification for a long-running agent-orchestration service. Symphony itself is not a guideline; it is an example of what a rigorous system-level spec looks like. This framework extracted its structure into a reusable template.
-### Breaking Changes
-None at the PRD format level. v4.0.0 is "breaking" because:
-1. Activation prompts should reference `WORKFLOW.md`
-2. Every PRD structure now includes an Agent Execution Plan section
-3. The taxonomy grew from 4 guidelines to 6
-4. Deterministic rules should migrate from PRD prose into hooks
-Teams that do not adopt `WORKFLOW.md` can continue using v3.x guidelines verbatim — nothing in v4.0.0 invalidates a v3.x PRD.
+### Why v4.0.0 is a Major Version
+The underlying PRD format is not broken: v3.x PRDs remain readable and valid. v4.0.0 is released as a major version because producing a **v4.0.0-conformant** artifact requires expectations a v3.x project will not have in place:
+1. A `WORKFLOW.md` policy file at the repository root. Every v4.0.0 PRD references it; every activation prompt expects it.
+2. An Agent Execution Plan section in every PRD structure (branch name, delegatable research, required hooks, workflow file reference).
+3. A guideline taxonomy that grew from four to six. Cross-references between guidelines were re-wired to include `system-specification-guidelines.md` and `workflow-file-guidelines.md`.
+4. Deterministic rules that v3.x guidelines ask the agent to "remember" now migrate to hooks. The Tasks guideline assumes archival verification is wired into a `Stop` hook; Backend/Frontend guidelines assume test gating is wired into a `PreToolUse(Bash:git commit)` hook.
+5. Activation prompts that mention `WORKFLOW.md` and subagent delegation. The v3.x prompt style (no workflow reference, no recon subagent) no longer produces a complete v4.0.0 PRD.
+
+**Compatibility**: Teams that do not adopt `WORKFLOW.md` and hooks can continue using v3.x guidelines verbatim — nothing in v4.0.0 invalidates a v3.x PRD. Mixing v4.0.0 guidelines into a project without the supporting `WORKFLOW.md` is possible but will produce PRDs that reference a file the project does not have.
 
 
 ## [3.0.0] - Tuesday, November 4, 2025
@@ -494,6 +545,8 @@ Teams adopting this framework now have:
 
 ## Version History
 
+- **4.0.0**: Agent-Era Update — tool-using agents, subagents, hooks, `WORKFLOW.md` convention, System guideline
+- **3.0.0**: Architectural Decision Framework — mandatory `[Backend/Frontend]` prefix, 5-Question Decision Framework, Architectural Audit
 - **2.0.0**: Framework completion with fourth guideline, ARCHIVAL PROTOCOL, and consistent naming convention
-- **1.1.0**: Real-world validation with battle-tested examples and institutionalized learnings
-- **1.0.0**: Initial stable release with complete framework, templates, and real-world validation 
+- **1.1.0**: Second example specification and institutionalized learnings
+- **1.0.0**: Initial stable release with framework, templates, and first example

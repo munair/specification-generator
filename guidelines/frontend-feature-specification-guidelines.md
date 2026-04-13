@@ -90,12 +90,14 @@ The frontend should handle:
    - NO → Consider other factors
 
 6. **"Does this require real-time or streaming updates?"**
-   - Server-pushed data, live feeds, WebSocket subscriptions → backend manages the stream; frontend consumes it
-   - Purely client-side polling of already-fetched data → Frontend timer/state
+   - Server-pushed data (SSE/WebSocket/long-polling), live feeds, multi-subscriber fan-out → **System** (see `system-specification-guidelines.md` §6 "Streaming Transports"). The backend owns transport choice, reconnect semantics, and backpressure; the frontend owns render, stale-frame detection, and reconnect UX.
+   - Purely local UI timers over already-fetched data (countdown, animation, debounced render) → Frontend only
 
 7. **"Is an audit trail or regulatory record required?"**
-   - Anything that must be logged immutably (trades, auth events, user consent) → Backend persists the record
+   - Anything that must be logged immutably (trades, auth events, user consent) → **System** (see `system-specification-guidelines.md` §7 "Audit & Compliance Records"). The system spec owns the log schema, retention, PII redaction, and the write path. The frontend must not be the sole source of truth for an audit-relevant event.
    - Ephemeral UI state with no compliance requirement → Frontend only
+
+> **Streaming and audit are cross-cutting system concerns, not frontend PRD content.** This guideline routes those questions to the System guideline rather than reproducing its advice. A frontend PRD should reference the system spec section that owns the contract, then specify only the frontend's side of the contract (render, reconnect UX, error surfacing).
 
 ### Common Anti-Patterns to Avoid
 
@@ -117,9 +119,9 @@ The frontend should handle:
 ❌ **DON'T**: "Frontend normalizes raw API response schema before rendering"
 ✅ **DO**: "Backend returns a response shaped to the view's needs; frontend renders directly"
 
-### Spanning Requirements ([Backend/Frontend/Both])
+### Spanning Requirements: Always Split
 
-When a single feature requirement touches both layers, split it into two FRs — one per layer — so each has a clear owner:
+When a single feature requirement touches both layers, **always split it into separate FRs** — one per layer — so each has a clear owner, a clear acceptance criterion, and a clear verification step:
 
 ```
 # Instead of one vague requirement:
@@ -130,7 +132,14 @@ FR1: Backend: Calculate expiration-specific P/C ratios and include them in the o
 FR2: Frontend: Display the pre-calculated putCallRatio field from the backend response
 ```
 
-Use `[Both]` only for shared infrastructure concerns (e.g., error envelope schema agreed by both sides). When in doubt, split into separate FRs.
+**How to identify a spanning requirement**:
+1. The verbs describe both server-side work (calculate, persist, aggregate, emit, authenticate) **and** client-side work (render, animate, hide, validate input) in one sentence.
+2. Two engineers on different layers would each claim parts of it as "mine."
+3. A test for it would have to touch both a Lambda handler file and a React component file.
+
+If any of those is true, it is a spanning requirement — split it.
+
+**There is no `[Both]` prefix.** Even cross-cutting contracts (error envelope schema, API response shape, WebSocket frame format) split cleanly: one side defines and emits, the other side parses and renders. Those become two FRs pointing at the same shared schema file, not one `[Both]` FR. Shared schemas belong in a Technical Considerations section (or a System spec), not in a `[Both]` functional requirement.
 
 ### Options Trading Context Examples
 
@@ -206,18 +215,12 @@ Only then ask questions about things the codebase genuinely cannot answer.
 - **Success Metrics:** How will we measure success (both quantitative and qualitative)?
 - **Agent Orchestration (NEW):** Which stages should run as subagents? Which hooks should gate commits? Is a separate visual-regression agent needed?
 
-**For Complex Features - Boundary Checklist:**
+**For Complex Features — Boundary Checklist (scope only; the consolidated Final Audit at §5 covers placement and execution):**
 - ☐ Have we listed 3-5 explicit things this feature will NOT do?
 - ☐ Have we defined Phase 1 (minimal viable) vs Phase 2+ (future enhancements)?
 - ☐ Have we identified all system integrations and dependencies?
-- ☐ Have we explicitly assigned work to backend vs frontend with justification?
-- ☐ Have we verified no frontend data aggregation or heavy computation?
-- ☐ Have we verified no sequential multi-endpoint frontend data hydration?
 - ☐ Have we outlined clear acceptance criteria?
 - ☐ Have we defined success metrics with failure thresholds?
-- ☐ **v4.0.0**: Have we identified delegatable research for Explore subagents?
-- ☐ **v4.0.0**: Have we named the branch/worktree and relevant hooks?
-- ☐ **v4.0.0**: Are acceptance criteria machine-verifiable (test assertions, not prose)?
 
 ### Scope Control (Ask When Needed)
 - **Problem/Goal:** What specific problem does this solve for users?
@@ -297,39 +300,35 @@ Consider these prompts:
 - **Surface All Assumptions** – Document or question them, never hide them
 - **Testing is Mandatory** – Every feature must define test scenarios
 
-### PRD Review Checkpoint: Architectural Audit
+### PRD Review Checkpoint: Final Audit
 
-**Before finalizing PRD, audit each functional requirement:**
+**Before finalizing PRD, run this consolidated checklist. It replaces the separate Architectural Audit, Agent Orchestration Audit, and Boundary Checklist from earlier v3.x/v4.0.0 drafts — one list, no duplicates.**
 
-☐ Have we justified why work is on frontend vs backend?
-☐ Are we avoiding frontend data aggregation and complex calculations?
-☐ Are we avoiding sequential multi-endpoint calls from the frontend?
-☐ Are calculations and data transformations happening on the backend?
-☐ Will the backend API shape support future clients (mobile, desktop, API consumers)?
-☐ Are we following the "smart backend, simple frontend" principle?
-☐ Does each backend FR have a clear error response shape the frontend can handle?
-☐ Are we reusing existing API endpoints where possible (not creating new ones for convenience)?
+**Architectural placement**
+- ☐ Has each functional requirement been justified as frontend or backend (no spanning `[Both]`)?
+- ☐ Are all calculations, aggregations, normalizations, and schema transformations on the backend?
+- ☐ Does each backend FR have a clear error envelope shape the frontend can handle?
+- ☐ Does the API shape support future clients (mobile, desktop, API consumers) without refactoring?
+- ☐ Are we reusing existing endpoints where possible instead of inventing new ones for convenience?
+- ☐ Are streaming and audit requirements routed to the System guideline (not specified inline in this PRD)?
 
-**Red Flags**:
-- PRD mentions "frontend calculates", "frontend aggregates", or "frontend normalizes"
-- Frontend makes 2+ sequential API calls to hydrate a single view
-- Frontend doing data normalization or schema transformation before rendering
+**Agent execution plan**
+- ☐ Is the branch/worktree name specified?
+- ☐ Is delegatable research broken out for Explore/Plan subagents?
+- ☐ Are hooks named for deterministic rules (test gating, lint, accessibility)?
+- ☐ Does the PRD reference `WORKFLOW.md` / `CLAUDE.md` instead of restating its rules?
+- ☐ Are acceptance criteria machine-verifiable (test assertions, not prose like "looks polished")?
+
+**Red flags — rewrite the PRD if any apply**:
+- "Frontend calculates", "frontend aggregates", or "frontend normalizes"
+- Frontend makes three or more sequential API calls to hydrate a single non-gated view (carve out user-gated drill-downs, lazy-loaded tabs, and code-split routes — those are fine)
+- Frontend doing schema transformation before rendering
 - Complex business logic in React components or hooks
-- Audit/compliance-relevant operations assigned to frontend
-
-### PRD Review Checkpoint: Agent Orchestration Audit (v4.0.0)
-**Before finalizing PRD, audit the execution plan:**
-☐ Is the branch/worktree name specified?
-☐ Are hooks identified for deterministic rules (tests, linting, accessibility)?
-☐ Is delegatable research broken out for Explore/Plan subagents?
-☐ Does the PRD reference `WORKFLOW.md`/`CLAUDE.md` instead of restating it?
-☐ Are acceptance criteria machine-verifiable (test assertions, not prose)?
-☐ Does the PRD avoid instructing the agent to "always remember" things? (Those go in hooks.)
-**Red Flags**:
-- Prose rules the agent must "remember" — should be a hook
-- Acceptance criteria like "looks polished" — not machine-verifiable
-- Restating commit-message or test-command conventions inline
-- A flat task list the main agent must run sequentially when subagents could parallelize research
+- Audit or compliance-relevant operations assigned to frontend
+- Streaming transport (SSE, WebSocket, long-poll) specified in a frontend PRD rather than routed to the System guideline
+- Prose rules the agent must "remember" — these should be hooks
+- Restated `WORKFLOW.md` / `CLAUDE.md` contents inline
+- A flat sequential task list when subagents could parallelize independent research
 
 ### Supporting Documentation Guidelines
 - **User Guides** – Create for all user-facing features to ensure adoption and proper usage
