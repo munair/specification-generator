@@ -6,6 +6,20 @@ The framework explicitly tells an AI Assistant: "First, build the fence. Then, e
 **v3.0.0**: Architectural guidance to prevent frontend/backend responsibility misplacement.
 **v4.0.0 update**: This guideline now assumes a **tool-using agent** — not a chat-loop assistant. The agent can read components, run Vitest, spawn subagents, open a preview build, and commit its own work. PRDs must be written for that execution model.
 
+## When to Use This Guideline (and When Not To)
+
+**Use this guideline for**: a single React component, a hook, a feature that lives entirely in the React tree, or a full-stack feature whose user-facing surface is the dominant concern. When the unit of work is "what the user sees and interacts with," this is the right guideline — even if the feature also requires a backend FR or two (split them per [§2 Spanning Requirements](#spanning-requirements-always-split)).
+
+**Do not use this guideline for**:
+
+- **A pure backend handler with no user-facing component** — use [`backend-feature-specification-guidelines.md`](backend-feature-specification-guidelines.md) instead. A frontend PRD whose Functional Requirements are 90% `[Backend]` is a backend PRD with a frontend cameo.
+- **A streaming transport** — even if the frontend consumes the stream, the transport choice, reconnect semantics, and backpressure policy belong in [`system-specification-guidelines.md`](system-specification-guidelines.md) §6. The frontend PRD references that section and owns only render, stale-frame detection, and reconnect UX.
+- **An audit-relevant event** — the frontend must not be the source of truth for an audit-relevant action. Route the design to [`system-specification-guidelines.md`](system-specification-guidelines.md) §7 and have the frontend PRD reference it.
+- **A multi-component system or service** (orchestrator, daemon, scheduler) — use [`system-specification-guidelines.md`](system-specification-guidelines.md) instead. A frontend PRD that grows a state machine and a component table is a system specification in disguise.
+- **Creative ideation that has not yet narrowed to a target screen or interaction** — use [`exploratory-feature-specification-guidelines.md`](exploratory-feature-specification-guidelines.md) first, then migrate.
+
+When the scope is ambiguous, prefer the more specific guideline. A frontend PRD that grows cross-cutting sections is a sign the wrong guideline was picked — escalate to a system specification instead of cramming.
+
 ---
 
 ## 0. Agent-Era Execution Model (v4.0.0)
@@ -306,31 +320,33 @@ Consider these prompts:
 
 **Before finalizing PRD, run this consolidated checklist. It replaces the separate Architectural Audit, Agent Orchestration Audit, and Boundary Checklist from earlier v3.x/v4.0.0 drafts — one list, no duplicates.**
 
+Each red-flag bullet below carries a stable identifier from [`specification-validation-vocabulary.md`](specification-validation-vocabulary.md) in parentheses. A reviewer subagent can cite those identifiers directly when reporting findings.
+
 **Architectural placement**
-- ☐ Has each functional requirement been justified as frontend or backend (no spanning `[Both]`)?
-- ☐ Are all calculations, aggregations, normalizations, and schema transformations on the backend?
-- ☐ Does each backend FR have a clear error envelope shape the frontend can handle?
-- ☐ Does the API shape support future clients (mobile, desktop, API consumers) without refactoring?
-- ☐ Are we reusing existing endpoints where possible instead of inventing new ones for convenience?
-- ☐ Are streaming and audit requirements routed to the System guideline (not specified inline in this PRD)?
+- ☐ Has each functional requirement been justified as frontend or backend (no spanning `[Both]`)? `(fr_uses_both_prefix, spanning_requirement_not_split)`
+- ☐ Are all calculations, aggregations, normalizations, and schema transformations on the backend? `(frontend_calculates, frontend_schema_transformation)`
+- ☐ Does each backend FR have a clear error envelope shape the frontend can handle? `(missing_error_envelope)`
+- ☐ Does the API shape support future clients (mobile, desktop, API consumers) without refactoring? `(response_shape_driven_by_caller)`
+- ☐ Are we reusing existing endpoints where possible instead of inventing new ones for convenience? `(sequential_hydration)`
+- ☐ Are streaming and audit requirements routed to the System guideline (not specified inline in this PRD)? `(frontend_streaming_spec, frontend_audit_source)`
 
 **Agent execution plan**
-- ☐ Is the branch/worktree name specified?
-- ☐ Is delegatable research broken out for Explore/Plan subagents?
-- ☐ Are hooks named for deterministic rules (test gating, lint, accessibility)?
-- ☐ Does the PRD reference `WORKFLOW.md` / `CLAUDE.md` instead of restating its rules?
-- ☐ Are acceptance criteria machine-verifiable (test assertions, not prose like "looks polished")?
+- ☐ Is the branch/worktree name specified? `(missing_branch_name)`
+- ☐ Is delegatable research broken out for Explore/Plan subagents? `(missing_delegatable_research)`
+- ☐ Are hooks named for deterministic rules (test gating, lint, accessibility)? `(prose_deterministic_rule)`
+- ☐ Does the PRD reference `WORKFLOW.md` / `CLAUDE.md` instead of restating its rules? `(workflow_content_restated)`
+- ☐ Are acceptance criteria machine-verifiable (test assertions, not prose like "looks polished")? `(acceptance_criteria_not_measurable, missing_accessibility_criteria)`
 
 **Red flags — rewrite the PRD if any apply**:
-- "Frontend calculates", "frontend aggregates", or "frontend normalizes"
-- Frontend makes three or more sequential API calls to hydrate a single non-gated view (carve out user-gated drill-downs, lazy-loaded tabs, and code-split routes — those are fine)
-- Frontend doing schema transformation before rendering
-- Complex business logic in React components or hooks
-- Audit or compliance-relevant operations assigned to frontend
-- Streaming transport (SSE, WebSocket, long-poll) specified in a frontend PRD rather than routed to the System guideline
-- Prose rules the agent must "remember" — these should be hooks
-- Restated `WORKFLOW.md` / `CLAUDE.md` contents inline
-- A flat sequential task list when subagents could parallelize independent research
+- `(frontend_calculates)` "Frontend calculates", "frontend aggregates", or "frontend normalizes"
+- `(sequential_hydration)` Frontend makes three or more sequential API calls to hydrate a single non-gated view (carve out user-gated drill-downs, lazy-loaded tabs, and code-split routes — those are fine)
+- `(frontend_schema_transformation)` Frontend doing schema transformation before rendering
+- `(frontend_calculates)` Complex business logic in React components or hooks
+- `(frontend_audit_source)` Audit or compliance-relevant operations assigned to frontend
+- `(frontend_streaming_spec)` Streaming transport (SSE, WebSocket, long-poll) specified in a frontend PRD rather than routed to the System guideline
+- `(prose_deterministic_rule)` Prose rules the agent must "remember" — these should be hooks
+- `(workflow_content_restated)` Restated `WORKFLOW.md` / `CLAUDE.md` contents inline
+- `(missing_parallel_markers)` A flat sequential task list when subagents could parallelize independent research
 
 ### Supporting Documentation Guidelines
 - **User Guides** – Create for all user-facing features to ensure adoption and proper usage

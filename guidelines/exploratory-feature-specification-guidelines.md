@@ -77,6 +77,22 @@ Keep it to bullets. If the findings run longer than five bullets, spawn another 
 
 ---
 
+## 6.5 Exploration Review Checkpoint: Light Final Audit
+
+Exploratory specifications are loose by design — they are scratch space for creative work, not contracts the agent will execute. But there are still a few failure modes a reviewer (or the agent itself, as a self-check) should flag before migrating an exploratory document into a domain-specific PRD. Each red flag below carries a stable identifier from [`specification-validation-vocabulary.md`](specification-validation-vocabulary.md).
+
+The audit is short on purpose. An exploratory document that survives this checklist is ready to migrate to a Backend, Frontend, or System guideline.
+
+- ☐ Was §0 actually run? Did an Explore subagent survey the codebase before §1 was opened, and is the result summarized in §0.5? `(missing_recon_findings)`
+- ☐ Does §0.5 surface any hidden constraints (existing data shape, auth model, perf budget) that should become fence rails when this exploration is migrated to a formal PRD?
+- ☐ Does §0.5 flag any prior art — adjacent features that already exist in the codebase or in a prior PRD — so §1 can pivot to augmentation instead of rebuild? `(exploration_overrode_boundaries)`
+- ☐ Does §3 The Failure Mode reference dead ends from §0.5 rather than re-discovering them?
+- ☐ When the document is migrated to a domain-specific guideline (Backend, Frontend, System), is the migration target clear? An exploratory document that cannot name its migration target is a document that has not yet earned a fence.
+
+> **Why this audit is light.** Exploratory specifications are exempt from the rigor that domain PRDs require — the whole point is to wander. The audit catches only failures that would cause downstream rework: skipped recon, contradicted constraints, and ambiguity about where the exploration is headed next.
+
+---
+
 ## 7. Archival Cross-Reference
 
 **IMPORTANT**: When archiving implementation logs, follow the **ARCHIVAL PROTOCOL** in `implementation-tasks-creation-guidelines.md`.

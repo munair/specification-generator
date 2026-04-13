@@ -20,6 +20,82 @@ Before generating any task list, the agent must understand how tasks will actual
 5. **Delegatable research should be hoisted.** Any broad investigation the task list depends on (e.g., "find all callers of `formatCurrency`") should be a subagent task at the top of the list, not inline work that pollutes the main agent's context.
 6. **Every task has a verification step.** "Add function X" is incomplete. "Add function X; verify by running `node --test tests/utilities/x.test.cjs` and confirming all assertions pass" is complete.
 7. **The `WORKFLOW.md` / `CLAUDE.md` contract.** Before generating tasks, the agent must read `WORKFLOW.md` (or `CLAUDE.md`) at the repository root. That file defines test commands, commit style, hook configuration, and branch rules. Do not restate those rules in the task list — reference them.
+
+## Reference Pseudocode: How an Agent Consumes a PRD
+
+The pseudocode below is the canonical reference for how a tool-using agent in v4.0.0 consumes a Feature Specification, generates a task list, and executes it. It is intentionally language-neutral — the implementer chooses the harness, the tool names, and the concurrency primitives. What the pseudocode pins down is **ordering, error paths, and the gates that hooks enforce**. See the [README's "The Case for Pseudocode in Specifications"](../README.md#the-case-for-pseudocode-in-specifications) for the broader rationale on why pseudocode beats prose for control flow this load-bearing.
+
+```
+function agent_execute_prd(prd_path):
+    workflow = read("WORKFLOW.md")           // single source of truth
+    prd      = read(prd_path)
+
+    audit = run_final_audit(prd, vocabulary = specification_validation_vocabulary)
+    if audit.errors:
+        present_errors_to_user(audit.errors)
+        return                                // do NOT proceed with a failed audit
+
+    branch = prd.agent_execution_plan.branch
+    assert branch != workflow.default_branch  // never on main; see WORKFLOW.md §2
+    workspace = checkout_or_create_branch(branch)
+
+    // Phase 0 — recon. Spawn the PRD's Delegatable Research items in parallel.
+    // Findings inform the plan; the plan does not precede them.
+    findings = parallel_map(
+        spawn_subagent,
+        prd.delegatable_research
+    )
+
+    plan = propose_high_level_plan(prd, findings)
+    user_confirmation = ask_user("Respond with 'Let's boogie!' to proceed")
+    if user_confirmation != "Let's boogie!":
+        return                                // wait for explicit approval
+
+    tasks = generate_granular_tasks(plan, prd, findings)
+    write("documentation/tasks/active/implementing-" + prd.feature_name + ".md", tasks)
+    commit_task_list(tasks, message = "docs(tasks): add implementation log for " + prd.feature_name)
+
+    // Phase 1+ — execute the task list.
+    for phase in tasks.phases:
+        if phase.parallel:
+            parallel_map(execute_task, phase.tasks)
+        else:
+            for task in phase.tasks:
+                execute_task(task)
+                assert task.verification_command_succeeds()
+                    // Pre-commit hook gates each commit; see WORKFLOW.md §4.
+                    // If the hook denies, the task is NOT marked complete.
+                mark_task_complete(task)
+
+    // Archival — Stop hook will refuse to let the session end if any
+    // task is still unchecked. See templates/scripts/verify-archival.bash.
+    archive_implementation_log(prd.feature_name)
+
+
+function execute_task(task):
+    // Each task has a verification command; missing one is a vocabulary
+    // failure: (task_no_verification_step) — refuse to execute.
+    assert task.has_verification_command()
+
+    if task.is_subagent_delegated:
+        result = spawn_subagent(task.description, return_summary = true)
+        return result
+
+    // Main-agent execution path: read, edit, verify, commit.
+    apply_edits(task.edits)
+    run(task.verification_command)             // exits non-zero -> raise
+    return "ok"
+```
+
+What this pseudocode pins down that prose alone obscured:
+
+- **The audit happens *before* the branch is created**, not after — so a failed audit never leaves a half-checked-out workspace behind.
+- **Recon happens *before* the plan is proposed**, not after — so findings inform the plan rather than chasing it. This is the structural reason Step 3.5 of the Process section exists.
+- **The user-confirmation step is a hard gate**, not a polite interjection — the function `return`s if approval is missing.
+- **Verification is per-task, not per-phase** — a phase with three tasks runs three verification commands, not one. The pre-commit hook denies the commit if the verification fails.
+- **Archival is gated by the Stop hook**, not by the agent's own honor system. The hook is the source of truth for "are we allowed to end the session?"
+
+If you cannot follow this pseudocode in your head against your own task list, your task list is not yet executable by an agent. That is the diagnostic value of having a reference loop in the guideline.
 ## ⚠️ ARCHIVAL PROTOCOL ⚠️
 **READ THIS FIRST** - If you're archiving a completed task list, follow this checklist EXACTLY.
 **v4.0.0 note**: As of v4.0.0, the archival protocol should be wired into a `Stop` or `SessionEnd` hook in `settings.json` that runs the verification commands automatically. The hook is the source of truth; this checklist documents what the hook enforces. If the hook is not yet wired up, the agent must run this checklist manually. See `templates/workflow-template.md` for the reference hook configuration.

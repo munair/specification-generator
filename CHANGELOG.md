@@ -5,6 +5,46 @@ All notable changes to the Specification Generator framework will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.2] - Monday, April 13, 2026
+
+### Specification Validation Vocabulary and Pseudocode Discipline
+
+A second polish pass on the v4.0.0 release, additive only. No new required PRD sections, no changes to existing PRD structure, no breaking changes to any guideline contract. v4.0.1 PRDs remain valid and conformant. Three themes: a named failure taxonomy for specification reviews, parity in the Final Audit surface across all four PRD guidelines, and reference pseudocode blocks for the two parts of the framework where ordering and error paths are most load-bearing.
+
+### Added
+
+- **`guidelines/specification-validation-vocabulary.md`** — a new top-level guideline file that names every failure mode a specification reviewer (human or subagent) can flag, with a stable identifier, a one-line description, the guideline and section it belongs to, an example of the failure, and an example of the fix. Approximately 50 codes organized into Cross-Guideline, Backend, Frontend, System, Implementation Tasks, Workflow File, and Exploratory categories. Adapted from the OpenAI Symphony `SPEC.md` §5.5 error-taxonomy pattern, where every validation failure has a stable name so hooks, tooling, and reviewers can reference the same concept without re-inventing vocabulary. Includes Conformance Profiles (Core / Extension / Integration) for tiering audits by specification type, and a forward-compatibility rule (unknown codes in audit output are ignored with a warning, never rejected).
+- **`PRD Review Checkpoint: Final Audit` section in `guidelines/system-specification-guidelines.md`** — system-spec parity with the Final Audit sections in the Backend (added in v4.0.1, Gap 9) and Frontend (consolidated in v4.0.0) guidelines. Three subsections covering Structural Completeness, Cross-Cutting Concerns (streaming and audit), and Testing & Execution; followed by a Red Flags list. Every checkbox and red-flag bullet cites a stable identifier from the new validation vocabulary.
+- **Lightweight Final Audit (§6.5) in `guidelines/exploratory-feature-specification-guidelines.md`** — an intentionally short audit suitable for the loose nature of exploratory documents. Catches only the failure modes that would cause downstream rework: skipped recon, contradicted constraints, ambiguous migration target. Cites vocabulary codes `missing_recon_findings` and `exploration_overrode_boundaries`.
+- **"When to Use This Guideline (and When Not To)" sections in the Backend and Frontend guidelines** — explicit "use this for" / "do not use this for" prose at the top of each guideline, matching the existing block in the System guideline. Helps an agent picking the wrong guideline catch the mistake before writing the PRD instead of after.
+- **Reference Pseudocode blocks** in two guidelines, with educational rationale in the README:
+  - **`guidelines/system-specification-guidelines.md` — IssueState state machine pseudocode** in the "Example: Structuring a Symphony-Like Spec" section. Demonstrates how pseudocode resolves the audit-write ordering question that prose §7.7 hedges around (audit write happens before the state transition; the workspace is released only after the audit row is committed; reconciliation distinguishes "in-flight with recent heartbeat" from "in-flight but stale"). Includes a paragraph on why pseudocode is a forcing function for the author, not a translation hint for the implementer.
+  - **`guidelines/implementation-tasks-creation-guidelines.md` — agent PRD-execution loop pseudocode** as a new section after Agent Execution Model. Pins down the gates that hooks enforce (audit before branch creation; recon before plan; user confirmation as a hard gate; per-task verification; archival gated by the Stop hook). Cross-references the new vocabulary file for failure codes.
+  - **`README.md` — "The Case for Pseudocode in Specifications"** new section between the Sample Interaction Flow and "What the Framework Aims to Produce." Educational prose covering: what pseudocode is in this framework (language-neutral, ordered, named-step descriptions of control flow); why pseudocode beats prose for hard parts of a specification (with a worked before/after example of an audit-write rule); pseudocode as a forcing function for the author rather than a translation hint for the implementer; pseudocode as a contract that commits to ordering and invariants while staying silent about syntax, libraries, and types; when to write pseudocode (state machines, ordering-dependent algorithms, reconciliation logic, multi-step transactions, agent-execution loops); when **not** to (simple CRUD, UI rendering, configuration shapes, anything over ~30 lines); and a reading order for the pseudocode in this repository so adopters can see the discipline in action.
+- **Vocabulary entry in `guidelines/README.md`** — the index file gains a new "Validation Vocabulary (1) — NEW in v4.0.2" subsection listing the categories of codes shipped in `specification-validation-vocabulary.md`, so adopters reading the directory index can find the new artifact.
+
+### Changed
+
+- **Backend guideline Final Audit (`guidelines/backend-feature-specification-guidelines.md`)** — every red-flag bullet and every checkbox in the Architectural Placement and Agent Execution Plan subsections now cites a stable identifier in parentheses from the validation vocabulary. Wording is unchanged; the parenthetical codes are additive metadata. A reviewer subagent or hook can cite the code directly when reporting findings rather than re-describing the failure in prose.
+- **Frontend guideline Final Audit (`guidelines/frontend-feature-specification-guidelines.md`)** — same backpatch as the backend guideline. Every checkbox and red-flag bullet in §5 PRD Review Checkpoint: Final Audit now cites the appropriate validation-vocabulary code(s).
+
+### Why This Polish Pass Is a Patch Release
+
+Per [`WORKFLOW.md` §7](WORKFLOW.md) version-bump rules, a patch release is "corrections, clarifications, and editorial polish that do not change expectations." The v4.0.2 changes meet that bar:
+
+- **No new required PRD sections.** Every section added is either internal (Final Audit, which lives in the guideline file rather than the resulting PRD) or additive (the vocabulary file is a new artifact that existing PRDs do not need to reference).
+- **No structural changes to existing PRDs.** v4.0.1 PRDs remain valid and conformant. The only thing that has changed is that a reviewer auditing them now has stable identifiers for findings.
+- **No new required artifacts at the project root.** v4.0.0 already requires `WORKFLOW.md`; v4.0.2 does not require anything new.
+- **All edits are additive.** Backpatching parenthetical codes onto existing checkboxes does not alter their semantics; new sections live alongside the existing structure rather than replacing it.
+
+The polish pass is appropriately scoped as a `4.0.2` changelog entry without rolling the `package.json` version forward, mirroring the v4.0.1 pattern.
+
+### Release Scope
+
+This polish pass made no structural change to the framework contract. v4.0.1 PRDs remain valid. The shipped artifacts now give specification reviewers a shared vocabulary for findings, give the System and Exploratory guidelines audit parity with the Backend and Frontend guidelines, and give the framework explicit pseudocode discipline for the parts of a specification where ordering and error paths matter most.
+
+---
+
 ## [4.0.1] - Monday, April 13, 2026
 
 ### Polish Pass for the Agent-Era Update

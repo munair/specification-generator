@@ -276,7 +276,107 @@ A system spec for "a service that orchestrates coding agents against an issue tr
 11. **Agent Execution Plan**: Branch `system/symphony`, subagent per component, hook-enforced test matrix.
 
 This is not a reprint of Symphony's spec — it's what the spec looks like when compressed through this guideline's spine.
+
+### Reference Pseudocode: The IssueState Machine
+
+A worked pseudocode block for the state transitions described above. Pseudocode is the right level of detail for a system specification: it nails down ordering, error paths, and invariants without committing to a language or a specific concurrency primitive. See the [README's "The Case for Pseudocode in Specifications"](../README.md#the-case-for-pseudocode-in-specifications) for the broader rationale.
+
+```
+function dispatch(issue):
+    assert issue.state == "queued"
+    if active_run_count() >= service_config.maxConcurrentRuns:
+        return  // wait for a slot; called again on the next tick
+
+    workspace = workspace_manager.allocate(issue.issueId)
+    run = RunAttempt {
+        runId: ulid(),
+        issueId: issue.issueId,
+        state: "scheduled",
+        workflowName: pick_workflow(issue),
+    }
+
+    audit_writer.write(run, "run_scheduled")  // FAIL-CLOSED — see §7.7
+        // if the audit write throws after retries, dispatch aborts;
+        // workspace is released; issue stays "queued"; operator alerted.
+
+    transition(issue, "queued" -> "running")
+    transition(run, "scheduled" -> "active")
+
+    spawn_async {
+        outcome = agent_runner.execute(run, workspace)
+
+        // the agent_runner streams LiveSession frames during execution;
+        // those are operational logs, not audit events.
+
+        audit_writer.write(run, outcome.action)  // FAIL-CLOSED again
+        transition(run, "active" -> "finished")
+        if outcome.success:
+            transition(issue, "running" -> "completed")
+        else if outcome.retriable and run.attempt < 3:
+            schedule_retry(run, backoff = [60, 300, 900][run.attempt])
+        else:
+            transition(issue, "running" -> "failed")
+        workspace_manager.release(workspace)
+    }
+
+function reconcile_on_restart():
+    for workspace in workspace_manager.list_dangling():
+        last_audit = audit_writer.last_record_for(workspace.runAttemptId)
+        if last_audit.state == "active" and recent_heartbeat(last_audit):
+            resume(workspace)
+        else:
+            mark_failed(workspace, reason = "restarted_during_run")
+            schedule_retry_for(workspace.runAttemptId)
+```
+
+What this pseudocode pins down that prose alone obscured: the audit-write *precedes* the state transition, not the other way around (so a failed audit aborts cleanly); the workspace release happens in the `finished` branch only after the audit row is committed; reconciliation distinguishes "in-flight with recent heartbeat" from "in-flight but stale," which would otherwise be a footnote that the implementer might miss. **If you cannot write the pseudocode, you do not yet understand the state machine** — that is the forcing-function value of this section.
+
 ---
+
+## Specification Review Checkpoint: Final Audit
+
+**Before finalizing the specification, run this consolidated checklist.** It is the system-spec counterpart to the Final Audit in [`backend-feature-specification-guidelines.md`](backend-feature-specification-guidelines.md) and [`frontend-feature-specification-guidelines.md`](frontend-feature-specification-guidelines.md) — one structured pass covering structure, cross-cutting design, execution plan, and red flags. The audit is a review step the agent runs *on* the finished specification before presenting it; its contents do not appear in the specification itself.
+
+Each red-flag bullet below carries a stable identifier from [`specification-validation-vocabulary.md`](specification-validation-vocabulary.md) in parentheses. A reviewer subagent or a hook can cite those identifiers directly when reporting findings.
+
+### Structural Completeness
+
+- ☐ Does §1 state the problem in concrete operational terms with measurable success criteria? `(missing_non_goals)` (the corollary — explicit out-of-scope statements live in §13)
+- ☐ Does §2 have a populated component table with Responsibility, Inputs, Outputs, and Lifecycle for every component? `(missing_component_table)`
+- ☐ Does §3 distinguish stable internal identifiers from display-facing identifiers for every entity? `(missing_stable_ids)`
+- ☐ Does §4 specify the service's own configuration file with schema, reload semantics, validation, and a forward-compatibility rule, distinct from the project-level `WORKFLOW.md`? `(missing_forward_compat_rule, service_policy_confused_with_workflow)`
+- ☐ Does §5 enumerate states, transitions, invariants, concurrency rules, retry policy, and reconciliation? `(missing_state_machine, missing_concurrency_rules, missing_reconciliation_design)`
+
+### Cross-Cutting Concerns
+
+- ☐ If §6 Streaming Transports is present, does it specify backpressure, resume semantics, and heartbeat? `(streaming_no_backpressure_policy, streaming_no_resume_semantics, streaming_no_heartbeat)`
+- ☐ If §7 Audit & Compliance Records is present, does it specify retention, PII redaction, access control, and the **fail-closed vs. fail-open** decision explicitly? `(audit_no_retention, audit_no_pii_policy, audit_no_access_control, audit_semantics_not_chosen)`
+- ☐ If §6 or §7 is genuinely not applicable, is it explicitly marked so rather than silently omitted?
+
+### Testing and Execution
+
+- ☐ Does every component named in §2 have a row in §10 Testing Matrix? `(missing_test_matrix_row)`
+- ☐ Does every row in §10 have a runnable verification command, not a prose description? `(test_matrix_row_no_verification_command)`
+- ☐ Does §11 name the branch or worktree, the subagent delegation strategy, the required hooks, and reference `WORKFLOW.md` rather than restating its rules? `(missing_branch_name, missing_delegatable_research, prose_deterministic_rule, workflow_content_restated)`
+- ☐ Does §12 document how to add a new component, a new configuration field, a new state, a new streaming message type, and a new audit event type?
+- ☐ Does §14 list open questions with owners and resolution dates, not just question marks?
+
+### Red Flags — Rewrite the Specification if Any Apply
+
+- `(missing_component_table)` §2 is a paragraph, not a table. A system spec without a component table is a wish list.
+- `(missing_stable_ids)` Domain entities use the tracker's display ID as the log/retry key. The first time the tracker renumbers, every log line lies.
+- `(missing_state_machine)` A component with non-trivial state has no enumerated state machine. "It runs to completion" is not a design.
+- `(missing_concurrency_rules)` No `maxConcurrentRuns`, no rate limit, no queue. The first hot run will starve the rest.
+- `(missing_reconciliation_design)` "On restart, start fresh." The first restart during an active run is now a silent data loss.
+- `(audit_semantics_not_chosen)` §7.7 hedges between fail-closed and fail-open. Pick one. Document the rationale. There is no third option.
+- `(missing_forward_compat_rule)` The service configuration schema does not state its unknown-key policy. The first schema evolution breaks every old deployment.
+- `(streaming_no_backpressure_policy)` §6 specifies the transport but not the slow-consumer policy. The first slow subscriber hangs the whole stream.
+- `(test_matrix_row_no_verification_command)` Matrix rows describe what is tested instead of how. "We'll write the tests later" is the v3.x mistake the matrix exists to prevent.
+- `(workflow_content_restated)` §11 restates test commands or commit style instead of pointing at `WORKFLOW.md`.
+- `(prose_deterministic_rule)` Deterministic rules ("the agent must always run the test matrix before commit") are stated as prose instead of being wired into a hook.
+
+---
+
 ## Guiding Principles
 - **Structure Over Prose**: Tables, state diagrams, and enumerated lists beat narrative paragraphs at the system level.
 - **Stable IDs First**: Before writing the state machine, nail down how entities are identified.
