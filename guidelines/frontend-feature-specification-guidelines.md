@@ -5,7 +5,9 @@ The framework explicitly tells an AI Assistant: "First, build the fence. Then, e
 
 **v3.0.0**: Architectural guidance to prevent frontend/backend responsibility misplacement.
 **v4.0.0 update**: This guideline now assumes a **tool-using agent** — not a chat-loop assistant. The agent can read components, run Vitest, spawn subagents, open a preview build, and commit its own work. PRDs must be written for that execution model.
+
 ---
+
 ## 0. Agent-Era Execution Model (v4.0.0)
 Before writing a PRD, assume the following about the agent that will consume it:
 1. **The agent has tools.** It can read TSX files, run `npm test`, grep the component tree, open a dev server, and commit. Frontend PRDs should reference those tools by name where relevant (e.g., "agent will run `npm test -- ComponentName.test.tsx` before committing").

@@ -1,8 +1,63 @@
-# Real-World Feature Specification Examples
+# Feature Specification Examples
 
-This directory contains actual feature specifications that were generated using our framework and successfully implemented in production. These serve as "beacons of brilliant light" showing the path forward for teams adopting this approach.
+This directory contains two kinds of example. The first kind are **v4.0.0 reference examples** that demonstrate the Agent-Era Update's expected shape — Agent Execution Plan section, Delegatable Research block, machine-verifiable acceptance criteria, `WORKFLOW.md` references, and the `[Backend]` / `[Frontend]` prefix. These are illustrative (not shipped in a production system). Use them as structural templates when drafting your own PRDs.
 
-## Why Domain-Specific Examples Matter
+The second kind are **v1.x legacy examples** from an earlier iteration of the framework. They predate the Agent-Era Update but are retained because their boundary-first methodology is still illustrative: explicit non-goals, progressive disclosure, creative-exploration-to-formal-PRD migration, and so on. Do not copy their structure for a v4.0.0 project — use the v4.0.0 examples above for that.
+
+## v4.0.0 Reference Examples
+
+These three examples demonstrate the full v4.0.0 shape across all three PRD domains. Each is a plausible-but-fictional feature written to exercise every section the guideline requires.
+
+### 1. Account Summary Endpoint (Backend Lambda)
+
+**File**: [`feature-specification-account-summary-endpoint-v4-backend-example.md`](feature-specification-account-summary-endpoint-v4-backend-example.md)
+
+**Guideline**: `backend-feature-specification-guidelines.md`
+
+**Demonstrates**:
+- `[Backend]`-prefixed functional requirements written as machine-verifiable assertions (HTTP status codes, exact response shapes, measurable latency budgets)
+- Agent Execution Plan section with branch name, required hooks, and workflow-policy reference
+- Delegatable Research hoisted to two Explore subagents and one Plan subagent
+- Zero restated `WORKFLOW.md` content — no Testing / Commit Format / Branch Policy sections in the PRD itself
+
+### 2. Strike Table Filter Panel (Frontend React Component)
+
+**File**: [`feature-specification-strike-table-filter-panel-v4-frontend-example.md`](feature-specification-strike-table-filter-panel-v4-frontend-example.md)
+
+**Guideline**: `frontend-feature-specification-guidelines.md`
+
+**Demonstrates**:
+- Correct spanning-requirement split: backend computes filters and annotates rows, frontend renders and toggles visibility — no `[Both]` requirement
+- `[Backend]` and `[Frontend]` prefixes on every functional requirement
+- Final Audit checklist section showing the v4.0.0 review pass applied to a real PRD (normally this is an internal agent step; it appears explicitly in this example to illustrate what a passing audit looks like)
+- Delegatable Research across Explore and Plan subagents
+- Failure and recovery strategy for the network and schema-validation paths
+
+### 3. Ticket Orchestrator (System-Level Specification)
+
+**File**: [`system-specification-ticket-orchestrator-v4-example.md`](system-specification-ticket-orchestrator-v4-example.md)
+
+**Guideline**: `system-specification-guidelines.md` (new in v4.0.0)
+
+**Demonstrates**:
+- All 14 sections of the system spec spine populated
+- Component table with responsibility / inputs / outputs / lifecycle for every component
+- Domain model with stable internal ULIDs distinct from display-facing tracker IDs
+- Service Policy / Configuration File section correctly distinguished from project-level `WORKFLOW.md`
+- §6 Streaming Transports with SSE choice justified, schema framing, backpressure (drop-oldest), `Last-Event-ID` reconnect, heartbeat, slow-consumer disconnect, and explicit frontend handoff
+- §7 Audit & Compliance Records with **fail-closed** write-path decision stated explicitly, schema, retention, immutability (daily hash chaining), PII redaction, and access control
+- Per-component Testing Matrix with verification commands
+- Agent Execution Plan with subagent-per-component parallelization
+
+These three examples share the same v4.0.0 conventions, so reading them side by side shows how the framework's shape stays consistent across backend / frontend / system layers while each domain pulls in the sections it actually needs.
+
+---
+
+## v1.x Legacy Examples (pre-Agent-Era)
+
+These specifications were developed under earlier versions of the framework and successfully implemented in production. They predate the v4.0.0 Agent-Era Update and therefore lack Agent Execution Plan sections, Delegatable Research blocks, `WORKFLOW.md` references, and machine-verifiable acceptance criteria. They are retained because their boundary-first methodology (explicit non-goals, progressive disclosure, creative exploration) remains illustrative. For the v4.0.0 shape, use the three reference examples above.
+
+### Why Domain-Specific Examples Matter
 
 While generic examples might seem more broadly applicable, we've chosen to share real specifications from our trading platform for several compelling reasons:
 
@@ -12,7 +67,7 @@ While generic examples might seem more broadly applicable, we've chosen to share
 4. **Trust Through Specificity** - Engineers trust concrete examples over abstract templates
 5. **Learning Transfer** - The patterns shown here apply across domains, even if the content is specific
 
-## The Examples
+## The v1.x Examples
 
 ### 1. Budget-Aware Strike Filtering & Selection Validation
 **Guideline Used**: Frontend Feature Specification (React/TypeScript component)
@@ -296,6 +351,6 @@ Have a specification that led to successful implementation? We welcome contribut
 
 ---
 
-**Last Updated**: Monday, November 2, 2025
-**Examples Status**: Production-validated, archival-complete
-**Framework Version**: Domain-First Organization (v2.0)
+**Last Updated**: Monday, April 13, 2026
+**Examples Status**: v4.0.0 reference examples (illustrative) alongside v1.x legacy examples (production-validated)
+**Framework Version**: v4.0.0 — Agent-Era Update

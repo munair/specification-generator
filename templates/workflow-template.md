@@ -10,7 +10,9 @@ default_branch: main
 # WORKFLOW.md — Project Automation Policy
 This file encodes **project-level rules** that coding agents (Claude Code, Codex, subagents, etc.) must honor when working in this repository. It is the **single source of truth** for test commands, commit conventions, branch rules, and hook configuration.
 > **Contract**: If a guideline (PRD, task list, system spec) says "follow project conventions," the agent reads this file rather than asking the human. If a rule is deterministic, it belongs here — or in a hook — not in a PRD narrative.
+
 ---
+
 ## 1. Test Commands
 
 The agent must run these before any commit. When the reference hook in §4 is configured, a `PreToolUse` event on `git commit` runs them automatically.
@@ -74,7 +76,7 @@ The following hooks should be present in `.claude/settings.json` (or your agent 
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/pre-commit-gate.sh"
+            "command": "bash .claude/hooks/pre-commit-gate.bash"
           }
         ]
       }
@@ -84,7 +86,7 @@ The following hooks should be present in `.claude/settings.json` (or your agent 
         "hooks": [
           {
             "type": "command",
-            "command": "bash scripts/verify-archival.sh"
+            "command": "bash scripts/verify-archival.bash"
           }
         ]
       }
@@ -94,7 +96,7 @@ The following hooks should be present in `.claude/settings.json` (or your agent 
         "hooks": [
           {
             "type": "command",
-            "command": "bash scripts/session-bootstrap.sh"
+            "command": "bash scripts/session-bootstrap.bash"
           }
         ]
       }
@@ -103,56 +105,52 @@ The following hooks should be present in `.claude/settings.json` (or your agent 
 }
 ```
 
-Supporting scripts:
+Supporting scripts — **copy-ready starting points ship with this framework under [`templates/scripts/`](scripts/)**. Each file is an annotated, portable starting point with a wiring-up comment at the top. Invoke them via `bash <path>.bash`; do not `chmod +x`.
 
-- `.claude/hooks/pre-commit-gate.sh` — reads the tool input from stdin, inspects the Bash command, runs tests/lint/typecheck only when the command contains `git commit`, and denies the tool use on failure. Minimal reference implementation:
+- [`templates/scripts/pre-commit-gate.bash`](scripts/pre-commit-gate.bash) — `PreToolUse` hook body. Reads the tool input from stdin, inspects the Bash command, runs tests/lint/typecheck only when the command contains `git commit`, and denies the tool use on failure. Fail-closed on `jq` errors, missing stdin, or unexpected input shape. Copy to `.claude/hooks/pre-commit-gate.bash` in your project and adapt the `TEST_COMMANDS` block.
 
-    ```bash
-    #!/bin/bash
-    INPUT=$(cat)
-    COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
-    [[ "$COMMAND" != *"git commit"* ]] && exit 0
+- [`templates/scripts/verify-archival.bash`](scripts/verify-archival.bash) — `Stop` hook body. Refuses to let the session end cleanly if any `documentation/tasks/active/implementing-*.md` file has unchecked boxes. Reports every offending file in the denial reason. Copy to `scripts/verify-archival.bash` in your project.
 
-    if ! (npm test && npm run lint && npm run typecheck); then
-      jq -nc '{
-        hookSpecificOutput: {
-          hookEventName: "PreToolUse",
-          permissionDecision: "deny",
-          permissionDecisionReason: "Tests, lint, or typecheck failed — fix before committing."
-        }
-      }'
-      exit 0
-    fi
-    exit 0
-    ```
+- [`templates/scripts/session-bootstrap.bash`](scripts/session-bootstrap.bash) — `SessionStart` hook body. Prints a one-line situational summary (current branch, active PRD, count of unchecked tasks). Strictly read-only. Copy to `scripts/session-bootstrap.bash` in your project.
 
-- `scripts/verify-archival.sh` — at `Stop`, refuses to let the session end cleanly if any `documentation/tasks/active/implementing-*.md` file has unchecked boxes.
-
-- `scripts/session-bootstrap.sh` — at `SessionStart`, prints a one-line summary of the current branch, active PRD, and unresolved tasks (optional but useful).
 ---
+
 ## 5. Subagent Delegation Defaults
+
 By default, delegate to subagents:
 - Any codebase survey spanning > 5 files → `Explore` subagent
 - Any architectural second opinion → `Plan` subagent
 - Any parallelizable test suite run → independent subagent per suite
 - Any independent component build (per system-specification-guidelines) → one subagent per component
 The main agent should keep its context focused on the critical path.
+
 ---
+
 ## 6. Archival Protocol
+
 Follow the **ARCHIVAL PROTOCOL** in `guidelines/implementation-tasks-creation-guidelines.md`. The `Stop` hook above enforces it automatically — but the protocol is the contract.
+
 ---
+
 ## 7. Project-Specific Conventions
+
 *(Fill in per project.)*
 - Directory layout: …
 - Deployment target: …
 - On-call / escalation: …
 - Secret management: …
 - Observability endpoints: …
+
 ---
+
 ## 8. Forward Compatibility
+
 **Unknown keys in front matter are ignored with a warning.** Adding new rules to this file should not break older agent harnesses. When deprecating a rule, leave it in place for one release cycle with a `deprecated: true` marker.
+
 ---
+
 ## 9. What Does NOT Belong Here
+
 - Feature-specific requirements → those go in a PRD
 - One-off instructions for a single task → those go in the task list
 - Architectural decisions about a specific component → those go in a system spec
