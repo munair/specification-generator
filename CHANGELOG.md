@@ -24,18 +24,18 @@ A fifth guideline for specifying **multi-component systems**: orchestrators, dae
 1. Problem & Goals
 2. System Architecture (component table with responsibility, inputs, outputs, lifecycle)
 3. Domain Model (with stable IDs)
-4. Service Policy / Config File (the service's own in-repository configuration  — distinct from the project `WORKFLOW.md`)
+4. Service Policy / Configuration File (the service's own in-repository configuration — distinct from the project `WORKFLOW.md`, with a naming note that explicitly disambiguates the two)
 5. State Machine & Orchestration
-6. Streaming Transports (SSE/WS/long-poll, backpressure, reconnect, resume)
-7. Audit & Compliance Records (schema, retention, immutability, fail-closed vs. fail-open)
+6. **Streaming Transports** — transport choice (SSE vs. WebSocket vs. long-poll vs. gRPC streaming vs. broker fan-out), message schema and framing with forward compatibility, producer/consumer backpressure and buffer bounds, reconnect and resume semantics (last-seen ID, backoff curves, idempotency, ordering guarantees), heartbeat and liveness, multi-subscriber fan-out and per-frame auth scope, graceful shutdown and close-code taxonomy, testing hooks, and an explicit frontend handoff rule that tells frontend PRDs what to reference and what to own.
+7. **Audit & Compliance Records** — scope (what is and is not an audit event), canonical record schema, storage/retention/immutability (WORM, append-only, hash chaining, GDPR carve-outs), PII and secret redaction, access control for reads and writes, export and replay paths for investigations, the **fail-closed vs. fail-open** write-path decision (with an explicit "there is no third option" rule), optional regulatory mapping table (SOX/FINRA, GDPR Article 7, SOC 2 CC6.1, etc.), and a frontend handoff rule that forbids the client from being the sole source of truth for an audit-relevant event.
 8. Safety & Integration
 9. Observability & Operations
-10. Testing Matrix (per component, with verification commands)
+10. Testing Matrix (per component, with verification commands; includes rows for Stream Encoder and Audit Writer in the example, and a "adapt test-file extensions to your stack" note)
 11. Agent Execution Plan
-12. Extensibility (first-class requirement)
+12. Extensibility (first-class requirement; covers new components, new config fields, new streaming message types, new audit event types)
 13. Non-Goals
 14. Open Questions
-**Use when**: specifying a service with ≥ 3 communicating components. **Do not use when**: specifying a single Lambda or single React component — the existing Backend or Frontend guideline is the right fit there.
+**Use when**: specifying a service with ≥ 3 communicating components, or a service that owns a streaming transport or an audit/compliance obligation. **Do not use when**: specifying a single Lambda or single React component — the existing Backend or Frontend guideline is the right fit there.
 #### New Guideline: `workflow-file-guidelines.md`
 Defines the `WORKFLOW.md` in-repository policy file convention. `WORKFLOW.md` (or `CLAUDE.md`, `AGENTS.md`, `.cursorrules` depending on harness) is the **single source of truth** for project-wide rules:
 - Test commands and pass criteria
@@ -67,14 +67,12 @@ Every existing guideline gained a new section explaining the execution model age
 6. Requirements must be machine-verifiable (test assertions, not prose)
 #### Agent Delegation Strategy (Backend & Frontend Guidelines)
 A new section in both the Backend and Frontend guidelines with a table of typical delegation candidates and a standard "Delegatable Research" format for PRDs to hoist recon work to subagents before writing implementation tasks.
-#### Agent Orchestration Audit (Frontend Guideline)
-A new checkpoint section, companion to the existing Architectural Audit, that reviews the Agent Execution Plan for red flags:
-- Prose rules the agent must "remember" (should be hooks)
-- Acceptance criteria that aren't machine-verifiable
-- Restating `WORKFLOW.md` contents inline
-- Sequential task lists that could be parallelized with subagents
+#### Consolidated Final Audit (Frontend Guideline)
+The frontend guideline's three previously separate audit checklists — the v2.x Boundary Checklist, the v3.0.0 Architectural Audit, and the early-v4 Agent Orchestration Audit — are now consolidated into a single **Final Audit** at §5. It covers architectural placement, agent execution plan, and red flags in one pass, without the overlap that had accumulated from three additive revisions. Red-flag items include prose rules the agent must "remember" (should be hooks), acceptance criteria that aren't machine-verifiable, restated `WORKFLOW.md` contents inline, sequential task lists that could be parallelized with subagents, streaming transport specified in a frontend PRD rather than routed to the System guideline, and `3+` (not `2+`) sequential API calls to hydrate a non-gated view — user-gated drill-downs, lazy tabs, and code-split routes are explicitly carved out.
+#### Spanning Requirements — Always Split (Frontend Guideline)
+When a single feature requirement touches both layers, the frontend guideline now **always** instructs splitting into per-layer FRs. The previous `[Both]` escape hatch is removed; its only example (error envelope schema) was itself a case that should be split (backend defines and emits; frontend parses and renders). A new "How to identify a spanning requirement" paragraph replaces the escape hatch with a concrete three-question test.
 #### Recon Findings Section (Exploratory Guideline)
-New Section 6.5 for summarized Explore subagent output, so exploration can be broader and cheaper without crowding out creative context.
+New Section 0.5 — **before the creative sections** — for summarized Explore subagent output. Section 0 instructs the agent to run recon first; the findings live upstream of §1 The Spark so recon actually informs the creative work instead of following it.
 #### Agent Execution Model Section (Tasks Guideline)
 A new first-class section in the Implementation Tasks guideline explaining how tasks are now executed by tool-using agents, including:
 - Tasks executed directly (not suggestions)
@@ -94,11 +92,29 @@ The task format example now includes:
 - Explicit verification commands on every sub-task
 - Delegated Work summary section
 ### Changed
-- **README.md**: Major rewrite of the "Getting Started" section with v4.0.0 activation prompts, migration guide from v3.x, and explicit guidance on when to use the new System guideline.
-- **guidelines/README.md**: Updated to document six guidelines (was four), new decision-matrix rows for system specs and repository setup, new v4.0.0 quick-reference commands.
+- **README.md**: Major rewrite of the "Getting Started" section with v4.0.0 activation prompts, migration guide from v3.x, and explicit guidance on when to use the new System guideline. "What You'll Find Here" rewritten to include all six guidelines (previously listed only four). Stale v2.x Getting Started block removed. Doubled tagline consolidated. Marketing language thinned.
+- **guidelines/README.md**: Updated to document six guidelines (was four). Decision matrix gained rows for multi-component services, orchestrators, cross-Lambda coordination, streaming/real-time services, audit-sensitive features, and repository setup. Stale v3.x Quick Reference block removed — consolidated to one v4.0.0 block.
 - **Clarifying Questions**: Each guideline now includes "Questions the Agent Should NOT Ask (Look Them Up Instead)" to push the agent toward tool use before asking.
 - **PRD Structure**: Every PRD structure now includes an explicit "Agent Execution Plan" section (branch name, delegatable research, required hooks, `WORKFLOW.md` reference).
-- **Package version**: Bumped to 4.0.0.
+- **`guidelines/system-specification-guidelines.md`**: Section 4 renamed "Workflow / Policy File" → "Service Policy / Configuration File" with a naming note that disambiguates it from the project-level `WORKFLOW.md`. Sections 8–14 renumbered to accommodate the new Streaming Transports and Audit & Compliance Records sections.
+- **`guidelines/frontend-feature-specification-guidelines.md`**: Streaming and audit decision-framework rows now **route** to `system-specification-guidelines.md` §6/§7 instead of reproducing partial guidance. The previous `[Both]` spanning-requirement escape hatch is removed. Three overlapping audit checklists consolidated into one Final Audit. The "2+ sequential API calls" red flag softened to `3+` with a user-gated carve-out.
+- **`templates/workflow-template.md`**: Hook JSONC rewritten to a valid Claude Code schema — `matcher` + nested `hooks[].type`/`command`. The earlier draft used a top-level `pattern` key that the Claude Code schema does not support; anyone who copied the template verbatim would have shipped a broken hook. A reference `pre-commit-gate.sh` script is included that parses stdin and only runs tests/lint/typecheck when the Bash command contains `git commit`. Test Commands block reframed as "delete what doesn't apply."
+- **`package.json`**: `main: "README.md"` removed (docs-only package); `private: true`, explicit `files` list, and a no-op `test` script added. Bumped to 4.0.0.
+
+### Fixed
+
+- **`.claude/hooks/protect-env.sh`** — the `.env`-protection hook had bypass vectors closed before v4.0.0 shipped:
+  - **Fail-closed on parse errors.** `jq` failures, missing input, and unexpected tool shapes now deny rather than pass through. Previously a malformed hook input resulted in empty variables and silent allow.
+  - **Shell-quote stripping before matching.** `bash -c 'printenv'` and `sh -c "cat .env"` are caught. Previously the word-boundary regex failed inside quoted subcommand content.
+  - **`.env.example` allowlist scoped to path fields only.** Decoy strings like `cat .env # see .env.example` no longer bypass the block. Previously the allowlist was checked against the full command string.
+  - **Redirect and subshell boundaries added.** `head <.env`, `$(cat .env)`, and backtick subshells are now caught by the path-boundary regex.
+  - **Env-dump coverage extended.** `export -p`, `declare -x`, `/proc/*/environ`, `ps -E` (macOS), and `ps eww`/`ps eaww` (BSD-style standalone `e` flag) are now blocked alongside `env`/`printenv`.
+  - **Bulk archive from repo root.** `tar`/`rsync`/`cpio` sourced from `.`/`./`/`$PWD` and `cp -r .`, `zip -r .` are now blocked. These tools copy the repository wholesale — including the real `.env` — without ever naming it, so they bypassed the literal-string match.
+  - **Case-insensitive matching.** `.ENV` blocks on macOS, where HFS+ is case-insensitive by default.
+  - **Denial logging** to `~/.claude/protect-env.log` with timestamp, tool name, and reason — a minimal audit trail.
+  - Verified against a 33-case deny/allow test suite covering all of the above.
+- **`.claude/settings.json`** — matcher extended to cover `Task|WebFetch|WebSearch|NotebookEdit` (previously only `Read|Write|Edit|Bash|Grep|Glob`). `.env*` deny rules duplicated from `Read` to `Edit`/`Write`/`Grep`/`Glob` as defense-in-depth: if the hook script errors or is deleted, the permissions layer still blocks those tools.
+- **`guidelines/implementation-tasks-creation-guidelines.md` task-format example** — the fenced template had a dropped `### Relevant Files` header, an orphan bullet list outside the fence, and a stray trailing fence. An agent copying the template verbatim would have produced a malformed document. The fenced example now has `### Relevant Files` and `### Delegated Work` subsections inside the fence, the orphan block outside is removed, and the fence is balanced.
 ### Unchanged (Still Valid from v3.0.0)
 - The "build the fence, explore the playground" philosophy
 - The `[Backend/Frontend]` prefix requirement in functional requirements
