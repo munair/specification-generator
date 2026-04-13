@@ -113,6 +113,8 @@ A reference template lives at `templates/workflow-template.md`. The companion gu
 6. **Let the agent use its tools first**. It should read `WORKFLOW.md`, grep the target directory, and delegate recon to subagents before asking you clarifying questions.
 7. **Approve and commit the PRD** at the critical checkpoint, then generate tasks with `guidelines/implementation-tasks-creation-guidelines.md`.
 
+> **Want to see a real, working `WORKFLOW.md`?** This repository has one at its root: [`/WORKFLOW.md`](WORKFLOW.md). It is the specification-generator project's own policy file, written under the v4.0.0 shape — this framework eats its own dog food. Use it as a worked example alongside the [`templates/workflow-template.md`](templates/workflow-template.md) starting point.
+
 ### If you're migrating from v3.x
 1. **Add `WORKFLOW.md` to your repo.** Copy the template, fill in your project's rules.
 2. **Wire up the reference hooks** from the template into `.claude/settings.json`.

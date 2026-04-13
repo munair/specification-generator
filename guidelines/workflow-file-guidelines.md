@@ -70,3 +70,9 @@ Instead of this (v3.x style):
 Write this (v4.0.0 style):
 > "See `WORKFLOW.md` for test commands, commit style, and hook configuration. The PreToolUse(git commit) hook will enforce test passage automatically."
 Shorter. More accurate. Automatically updated when `WORKFLOW.md` changes.
+
+## Worked Example — This Repository's Own `WORKFLOW.md`
+
+For a live, complete example of a `WORKFLOW.md` written under the v4.0.0 shape, see this repository's own policy file at `/WORKFLOW.md`. It is the specification-generator framework's own dog-food: every rule the framework tells adopters to put in a `WORKFLOW.md` is present in that file, adapted to the fact that this repository ships documentation rather than runnable code (the test-command section explicitly states that the project is docs-only and that no `PreToolUse(Bash:git commit)` hook is wired, with rationale).
+
+The file pairs with the abstract template at `templates/workflow-template.md`: the template is the starting point you copy into your own project, the repository-root `WORKFLOW.md` is what the same template looks like once it has been adapted to a specific project's constraints.
